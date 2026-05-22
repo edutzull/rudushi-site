@@ -1,0 +1,2065 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Viruși și Bacterii — Lecție interactivă</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Merriweather:wght@400;700&family=Bangers&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --ink:#0f1f3d; --paper:#060d1a; --v:#7c3aed; --b:#059669; --gold:#f59e0b;
+      --cream:#1a1f3a; --pur:#3b82f6; --ok:#d1fae5; --bad:#ede9fe;
+      --border:3px solid rgba(255,255,255,.18); --shadow:6px 6px 0 rgba(0,0,0,.5); --r:16px;
+      --card-bg:rgba(255,255,255,.07); --panel-bg:rgba(5,150,105,.08); --table-even:rgba(255,255,255,.05);
+      --text:#e8eeff; --text-muted:rgba(232,238,255,.65);
+    }
+    body{
+      font-family:'Nunito',sans-serif;
+      background:linear-gradient(135deg,#050d1a 0%,#0f1f3d 40%,#1e1b4b 65%,#064e3b 100%);
+      color:var(--text);
+      min-height:100vh;overflow-x:hidden;
+    }
+    /* Global canvas for flying particles */
+    #bgCanvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
+    .wrap{max-width:1320px;margin:0 auto;padding:22px;position:relative;z-index:1}
+
+    /* ====== LANDING PAGE ====== */
+    #landingPage{display:block}
+    #mainApp{display:none}
+
+    .landing-hero{
+      background:var(--ink);color:#fff;
+      border:var(--border);box-shadow:var(--shadow);border-radius:24px;
+      padding:0;margin-bottom:32px;position:relative;overflow:hidden;
+      min-height:520px;display:flex;flex-direction:column;justify-content:flex-end;
+    }
+    .landing-bg{
+      position:absolute;inset:0;
+      background:linear-gradient(135deg,#050d1a 0%,#0f1f3d 40%,#1e1b4b 60%,#064e3b 100%);
+    }
+    .landing-particles{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+    .p-dot{position:absolute;border-radius:50%;opacity:.18;animation:float 6s ease-in-out infinite}
+    @keyframes float{0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-18px) scale(1.08)}}
+    .landing-content{position:relative;z-index:2;padding:48px 40px 44px}
+    .landing-badge{
+      display:inline-block;background:var(--gold);color:var(--ink);
+      font-family:'Bangers',cursive;letter-spacing:.12em;font-size:.92rem;
+      padding:6px 16px;border-radius:999px;border:2px solid rgba(255,255,255,.25);margin-bottom:20px
+    }
+    .landing-title{
+      font-family:'Bangers',cursive;
+      font-size:clamp(3rem,7vw,6rem);
+      line-height:.96;letter-spacing:.03em;margin-bottom:18px;
+    }
+    .landing-title .v{color:var(--v);text-shadow:0 0 30px rgba(124,58,237,.5)}
+    .landing-title .b{color:var(--b);text-shadow:0 0 30px rgba(5,150,105,.5)}
+    .landing-title .amp{color:rgba(255,255,255,.4);margin:0 6px}
+    .landing-sub{
+      font-family:'Merriweather',serif;color:rgba(255,255,255,.75);
+      line-height:1.75;max-width:680px;font-size:1.05rem;margin-bottom:30px
+    }
+    .landing-chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:36px}
+    .chip{
+      padding:8px 16px;border-radius:999px;border:2px solid rgba(255,255,255,.2);
+      font-weight:800;font-size:.85rem;color:#fff;
+      background:rgba(255,255,255,.08);backdrop-filter:blur(4px)
+    }
+    .chip.red{border-color:rgba(124,58,237,.6);background:rgba(124,58,237,.15)}
+    .chip.teal{border-color:rgba(5,150,105,.6);background:rgba(5,150,105,.15)}
+    .chip.gold{border-color:rgba(245,158,11,.6);background:rgba(245,158,11,.15);color:var(--gold)}
+
+    .enter-btn{
+      display:inline-flex;align-items:center;gap:10px;
+      background:linear-gradient(135deg,var(--v),#5b21b6);
+      color:#fff;border:3px solid rgba(255,255,255,.25);
+      border-radius:14px;padding:16px 32px;
+      font-family:'Bangers',cursive;font-size:1.5rem;letter-spacing:.06em;
+      cursor:pointer;box-shadow:var(--shadow);
+      transition:transform .15s,box-shadow .15s
+    }
+    .enter-btn:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 #1a1a2e}
+
+    .landing-cells{
+      position:absolute;right:-40px;top:20px;width:55%;max-width:600px;
+      pointer-events:none;z-index:1;opacity:.55
+    }
+
+    .landing-features{
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:18px;margin-bottom:32px
+    }
+    .feat-card{
+      background:var(--card-bg);border:var(--border);box-shadow:var(--shadow);border-radius:var(--r);
+      padding:22px;position:relative;overflow:hidden;cursor:pointer;
+      transition:transform .15s,box-shadow .15s
+    }
+    .feat-card:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 #1a1a2e}
+    .feat-card .accent{
+      position:absolute;left:0;top:0;right:0;height:5px
+    }
+    .feat-card .ficon{font-size:2.2rem;margin-bottom:12px;display:block}
+    .feat-card h3{font-family:'Bangers',cursive;font-size:1.3rem;letter-spacing:.04em;margin-bottom:8px}
+    .feat-card p{font-family:'Merriweather',serif;font-size:.9rem;line-height:1.7;color:var(--text-muted)}
+    .acc-red{background:var(--v)}
+    .acc-teal{background:var(--b)}
+    .acc-gold{background:var(--gold)}
+    .acc-pur{background:var(--pur)}
+    .acc-blue{background:#3b82f6}
+    .acc-pink{background:#ec4899}
+
+    .authors-strip{
+      background:linear-gradient(135deg,#e8e4ff,#d8f4ec);border:var(--border);box-shadow:var(--shadow);border-radius:var(--r);
+      padding:18px 24px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:32px
+    }
+    .authors-strip .school{font-family:'Bangers',cursive;font-size:1.1rem;letter-spacing:.04em;color:var(--text-muted)}
+    .authors-strip .names{font-weight:800;font-size:1.05rem;color:var(--text)}
+
+    /* ====== MAIN APP ====== */
+    .back-btn{
+      display:inline-flex;align-items:center;gap:8px;
+      background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);border-radius:999px;
+      box-shadow:4px 4px 0 rgba(0,0,0,.4);padding:10px 18px;color:var(--text);
+      font-family:'Bangers',cursive;font-size:1rem;letter-spacing:.05em;
+      cursor:pointer;margin-bottom:20px;transition:transform .12s,box-shadow .12s
+    }
+    .back-btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
+
+    .hero{
+      background:var(--ink);color:#fff;border:var(--border);box-shadow:var(--shadow);
+      border-radius:24px;padding:38px 30px;margin-bottom:24px;position:relative;overflow:hidden;
+    }
+    .hero::after{content:'';position:absolute;right:0;top:0;width:40%;height:100%;background:linear-gradient(135deg,transparent 35%,rgba(124,58,237,.14))}
+    .hero small{display:block;font-family:'Bangers',cursive;font-size:1rem;letter-spacing:.16em;color:var(--gold);margin-bottom:14px}
+    .hero h1{font-family:'Bangers',cursive;font-size:clamp(2.3rem,5vw,4.2rem);line-height:1.04;letter-spacing:.04em;margin-bottom:14px}
+    .hero h1 .v{color:var(--v)} .hero h1 .b{color:var(--b)}
+    .hero p{font-family:'Merriweather',serif;line-height:1.7;max-width:820px;color:rgba(255,255,255,.88)}
+    .badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+    .badge{padding:7px 14px;border-radius:999px;border:2px solid #fff;font-weight:800;font-size:.85rem}
+    .badge.v{background:var(--v);border-color:var(--v)} .badge.b{background:var(--b);border-color:var(--b)} .badge.g{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+
+    .nav{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+    .tab{
+      border:2px solid rgba(255,255,255,.18);border-radius:999px;background:rgba(255,255,255,.08);color:var(--text);
+      box-shadow:4px 4px 0 rgba(0,0,0,.4);padding:10px 18px;cursor:pointer;
+      font-family:'Bangers',cursive;font-size:1.04rem;letter-spacing:.05em
+    }
+    .tab.on{background:rgba(124,58,237,.6);color:#fff;box-shadow:6px 6px 0 var(--gold),0 0 20px rgba(124,58,237,.4);transform:translate(-2px,-2px)}
+    .sec{display:none}.sec.on{display:block}
+    .stitle{text-align:center;margin-bottom:22px}
+    .stitle h2{font-family:'Bangers',cursive;font-size:clamp(1.8rem,4vw,3rem);letter-spacing:.05em;margin-bottom:8px}
+    .stitle p{font-family:'Merriweather',serif;color:var(--text-muted);line-height:1.7;max-width:820px;margin:0 auto}
+
+    .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+    .card,.panel,.reportBox,.badgeBox{
+      background:var(--card-bg);border:var(--border);box-shadow:var(--shadow);border-radius:var(--r);
+    }
+    .card{padding:22px;position:relative;overflow:hidden}
+    .topbar{position:absolute;left:0;right:0;top:0;height:5px}
+    .topbar.v{background:var(--v)} .topbar.b{background:var(--b)} .topbar.g{background:var(--gold)} .topbar.p{background:var(--pur)}
+    .card h3{font-family:'Bangers',cursive;font-size:1.35rem;letter-spacing:.04em;margin:6px 0 10px;color:var(--text)}
+    .card p{font-family:'Merriweather',serif;font-size:.94rem;line-height:1.75;color:var(--text-muted)}
+    .emoji{font-size:2rem}
+
+    .ctable{width:100%;border-collapse:collapse;overflow:hidden;border:var(--border);border-radius:var(--r);box-shadow:var(--shadow);background:var(--card-bg);margin-bottom:20px}
+    .ctable thead{background:rgba(124,58,237,.5);color:#fff}
+    .ctable th,.ctable td{padding:12px 14px;text-align:left;border-bottom:1px solid rgba(255,255,255,.08);color:var(--text)}
+    .ctable th{font-family:'Bangers',cursive;font-size:1.04rem;letter-spacing:.05em}
+    .ctable tr:nth-child(even){background:var(--table-even)}
+
+    .panel{padding:20px}
+    .panel h3{font-family:'Bangers',cursive;font-size:1.4rem;letter-spacing:.04em;margin-bottom:14px;color:var(--text)}
+    .legend{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+    .legend button{border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);border-radius:999px;padding:8px 12px;cursor:pointer;font-weight:800;color:var(--text)}
+    .legend button.on{background:rgba(255,255,255,.25);color:#fff}
+    .info{background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.12);border-radius:12px;padding:14px;min-height:100px}
+    .info h4{font-family:'Bangers',cursive;font-size:1.15rem;letter-spacing:.04em;color:var(--b);margin-bottom:6px}
+    .info p{font-family:'Merriweather',serif;line-height:1.7;color:var(--text-muted)}
+    svg{width:100%;height:auto;display:block}
+    .clickable{cursor:pointer;transition:opacity .15s}
+    .clickable:hover{opacity:.82}
+
+    .comic-head{text-align:center;margin-bottom:18px}
+    .comic-head h2{font-family:'Bangers',cursive;font-size:clamp(2rem,4vw,3.4rem)}
+    .comic-head em{font-style:normal;color:var(--v)}
+    .comic-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-items:stretch}
+    .comic-panel{background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.15);box-shadow:var(--shadow);border-radius:12px;overflow:hidden;min-height:280px;display:flex;flex-direction:column}
+    .scene-number{position:absolute;top:8px;left:10px;font-family:'Bangers',cursive;font-size:1.2rem;color:rgba(255,255,255,.3)}
+    .scene-top{min-height:90px;padding:10px 10px 8px;display:flex;align-items:flex-start;justify-content:center;background:rgba(255,255,255,.35)}
+    .bubbleRow{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;align-items:flex-start;max-width:100%}
+    .speech,.thought,.shout{line-height:1.25;text-align:center;word-break:break-word;max-width:140px;min-width:80px}
+    .speech{background:rgba(255,255,255,.93);border:2px solid rgba(15,31,61,.7);border-radius:18px;padding:7px 10px;font-size:.8rem;font-weight:900;box-shadow:2px 2px 0 rgba(15,31,61,.4);color:#0f1f3d}
+    .thought{background:rgba(255,249,239,.9);border:2px dashed rgba(15,31,61,.6);border-radius:18px;padding:7px 10px;font-size:.78rem;font-weight:800;color:#0f1f3d}
+    .shout{background:rgba(255,240,241,.92);border:2px solid var(--v);padding:7px 10px;font-size:.78rem;font-weight:900;color:var(--v);clip-path:polygon(8% 0%,92% 0%,100% 20%,95% 50%,100% 80%,92% 100%,8% 100%,0% 80%,5% 50%,0% 20%)}
+    .scene-art{min-height:160px;display:flex;align-items:center;justify-content:center;padding:6px 8px;position:relative}
+    .scene-cap{background:rgba(5,10,25,.82);color:#e8eeff;padding:8px 12px;font-size:.8rem;font-weight:800;line-height:1.4;border-top:1px solid rgba(255,255,255,.08)}
+    .bg-city{background:linear-gradient(180deg,#e8f4ff 0 62%,#d8efc5 62% 100%)}
+    .bg-lab{background:linear-gradient(180deg,#eef6fb 0 64%,#d5ead4 64% 100%)}
+    .bg-body{background:linear-gradient(180deg,#ffe9ea 0 60%,#ffd7d9 60% 100%)}
+    .bg-dark{background:linear-gradient(180deg,#2c3867 0 64%,#1a1a2e 64% 100%)}
+    .bg-bright{background:linear-gradient(180deg,#f8f1c3 0 66%,#efe6a0 66% 100%)}
+    .bg-hosp{background:linear-gradient(180deg,#eff8ff 0 65%,#e5f4e6 65% 100%)}
+    .progressWrap{margin:14px 0 20px}
+    .progressLabel{text-align:center;font-family:'Bangers',cursive;color:rgba(232,238,255,.7);font-size:.95rem;letter-spacing:.05em;margin-bottom:8px}
+    .bar{height:8px;background:rgba(26,26,46,.12);border-radius:999px;overflow:hidden}
+    .fill{height:100%;background:linear-gradient(90deg,var(--v),var(--b));width:16.6%;transition:width .35s}    .controls{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+    .controls button{border:2px solid rgba(255,255,255,.2);box-shadow:4px 4px 0 rgba(0,0,0,.4);border-radius:10px;padding:10px 18px;cursor:pointer;font-family:'Bangers',cursive;font-size:1rem;letter-spacing:.04em;color:#e8eeff}
+    .controls .prev{background:rgba(255,255,255,.1)}.controls .next{background:var(--v);color:#fff}.controls .restart{background:var(--b);color:#fff}
+
+    
+    .quizTop{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+    .quizMeta{font-weight:800;color:var(--text-muted)}
+    .qwrap{background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.15);box-shadow:var(--shadow);border-radius:var(--r);padding:22px}
+    .qwrap h3{font-size:1.2rem;line-height:1.55;margin-bottom:14px;color:var(--text)}
+    .qwrap h3{font-size:1.2rem;line-height:1.55;margin-bottom:14px}
+    .answers{display:grid;gap:10px}
+    .answerBtn{
+      text-align:left;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.15);border-radius:12px;padding:12px 14px;
+      cursor:pointer;font-size:1rem;font-weight:700;transition:all .12s;position:relative;color:var(--text)
+    }
+    .answerBtn:hover:not(.locked){background:rgba(255,255,255,.14);border-color:#7dd3fc;transform:translateX(3px)}
+    .answerBtn.selected{
+      background:#eff6ff;border-color:#3b82f6;border-width:3px;
+      box-shadow:3px 3px 0 rgba(59,130,246,.3)
+    }
+    .answerBtn.selected::before{content:'✓';position:absolute;right:14px;top:50%;transform:translateY(-50%);color:#3b82f6;font-weight:900;font-size:1.1rem}
+    .answerBtn.correct{background:var(--ok);border-color:#16a34a;border-width:3px}
+    .answerBtn.correct::before{content:'✓';position:absolute;right:14px;top:50%;transform:translateY(-50%);color:#16a34a;font-weight:900;font-size:1.1rem}
+    .answerBtn.wrong{background:var(--bad);border-color:#dc2626;border-width:3px}
+    .answerBtn.wrong::before{content:'✗';position:absolute;right:14px;top:50%;transform:translateY(-50%);color:#dc2626;font-weight:900;font-size:1.1rem}
+    .answerBtn.locked{cursor:default}
+    .confirm-bar{
+      display:none;margin-top:14px;padding:12px 16px;
+      background:#eff6ff;border:2px solid #3b82f6;border-radius:12px;
+      display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap
+    }
+    .confirm-bar.hidden{display:none}
+    .confirm-bar .hint{font-weight:700;color:#1e40af;font-size:.95rem}
+    .confirm-bar .change-btn{
+      background:#fff;border:2px solid #3b82f6;border-radius:999px;
+      padding:7px 14px;cursor:pointer;font-weight:800;font-size:.9rem;color:#1e40af
+    }
+    .confirm-bar .change-btn:hover{background:#dbeafe}
+    .confirm-bar .confirm-btn{
+      background:#3b82f6;border:2px solid #1e40af;border-radius:999px;
+      padding:7px 18px;cursor:pointer;font-weight:800;font-size:.9rem;color:#fff
+    }
+    .confirm-bar .confirm-btn:hover{background:#1d4ed8}
+    .feedback{margin-top:14px;border-radius:12px;padding:12px 14px;font-weight:800;display:none}
+    .feedback.ok{display:block;background:var(--ok);border:2px solid #16a34a}
+    .feedback.bad{display:block;background:var(--bad);border:2px solid #dc2626}
+    .questionFigure{margin:12px 0 18px;background:#faf7ef;border:2px dashed rgba(26,26,46,.25);border-radius:16px;padding:14px}
+    .hotspotWrap{display:grid;place-items:center}
+    .hotspotHint{font-size:.92rem;color:#64748b;text-align:center;margin-bottom:10px;font-weight:700}
+    .hotspot{transition:all .15s;cursor:pointer}
+    .hotspot:hover:not(.hs-locked){opacity:.84;filter:brightness(1.03)}
+    .hotspot.hs-selected{stroke:#3b82f6 !important;stroke-width:7 !important}
+    .hotspot.correctSpot{stroke:#16a34a !important;stroke-width:7 !important}
+    .hotspot.wrongSpot{stroke:#dc2626 !important;stroke-width:7 !important}
+    .hs-confirm-bar{
+      margin-top:10px;padding:10px 14px;
+      background:#eff6ff;border:2px solid #3b82f6;border-radius:12px;
+      display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap
+    }
+    .hs-confirm-bar.hidden{display:none !important}
+    .startArea{text-align:center;margin-top:18px}
+    .startBtn{padding:10px 28px;font-family:'Bangers',cursive;font-size:1.2rem;letter-spacing:.06em;border:var(--border);border-radius:999px;box-shadow:4px 4px 0 var(--ink);cursor:pointer;background:var(--v);color:#fff}
+    .nextBtn{display:none;margin-top:14px;padding:10px 18px;font-family:'Bangers',cursive;font-size:1rem;letter-spacing:.04em;border:var(--border);border-radius:10px;box-shadow:4px 4px 0 var(--ink);cursor:pointer;background:var(--b);color:#fff}
+
+    .resultWrap{display:grid;gap:18px}
+    .badgeBox,.reportBox{padding:22px}
+    .badgeBox h3,.reportBox h3{font-family:'Bangers',cursive;font-size:1.5rem;letter-spacing:.04em;margin-bottom:12px}
+    .resultScore{font-size:1.25rem;font-weight:900;margin-bottom:12px}
+    .badgePill{display:inline-block;padding:10px 18px;border-radius:999px;font-weight:900;border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);font-size:1rem}
+    .excellent{background:#bbf7d0}.good{background:#fde68a}.practice{background:#fecaca}
+    .reportTable{width:100%;border-collapse:collapse;margin-top:10px}
+    .reportTable th,.reportTable td{padding:10px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top}
+    .reportTable th{background:#f8fafc}
+    .small{font-size:.92rem;color:#475569}
+    .svg-box-label{font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;fill:#0f172a;pointer-events:none}
+
+    .simulare-note{
+      background:#fffde7;border:2px solid var(--gold);border-radius:12px;
+      padding:14px 18px;margin-bottom:18px;font-family:'Merriweather',serif;
+      font-size:.93rem;line-height:1.7;color:#78350f
+    }
+
+    /* ====== CURSOR GLOW ====== */
+    #cursorGlow{
+      position:fixed;pointer-events:none;z-index:9999;
+      width:320px;height:320px;border-radius:50%;
+      background:radial-gradient(circle,rgba(124,58,237,.13) 0%,rgba(5,150,105,.07) 40%,transparent 70%);
+      transform:translate(-50%,-50%);
+      transition:left .08s ease-out,top .08s ease-out;
+      mix-blend-mode:screen;
+    }
+    body:not(:hover) #cursorGlow,body:not(:hover) #cursorDot{opacity:0}
+
+    /* ====== SECTION TRANSITION ====== */
+    @keyframes secFadeSlide{
+      from{opacity:0;transform:translateY(22px) scale(.98)}
+      to{opacity:1;transform:translateY(0) scale(1)}
+    }
+    .sec.on{
+      animation:secFadeSlide .38s cubic-bezier(.22,1,.36,1) both;
+    }
+
+    /* ====== TAB RIPPLE ====== */
+    .tab{position:relative;overflow:hidden}
+    .tab .ripple{
+      position:absolute;border-radius:50%;
+      background:rgba(124,58,237,.25);
+      transform:scale(0);animation:rippleOut .5s linear;
+      pointer-events:none;
+    }
+    @keyframes rippleOut{to{transform:scale(4);opacity:0}}
+
+    /* ====== FEAT CARD SHINE ====== */
+    .feat-card::before{
+      content:'';position:absolute;inset:0;
+      background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.18) 50%,transparent 70%);
+      transform:translateX(-100%);transition:transform .5s;
+    }
+    .feat-card:hover::before{transform:translateX(100%)}
+
+    /* ====== HERO AURORA ====== */
+    .landing-hero::before{
+      content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+      background:
+        radial-gradient(ellipse 60% 40% at 20% 80%,rgba(124,58,237,.22) 0%,transparent 60%),
+        radial-gradient(ellipse 50% 35% at 80% 20%,rgba(5,150,105,.18) 0%,transparent 60%);
+      animation:auroraShift 8s ease-in-out infinite alternate;
+    }
+    @keyframes auroraShift{
+      from{opacity:.7;background-position:0% 0%}
+      to{opacity:1;background-position:100% 100%}
+    }
+
+    /* ====== GLOWING CARDS ====== */
+    .card{transition:transform .2s,box-shadow .2s}
+    .card:hover{
+      transform:translate(-3px,-4px);
+      box-shadow:9px 9px 0 var(--ink),0 0 30px rgba(124,58,237,.15);
+    }
+
+    /* ====== AUTHORS STRIP UPGRADE ====== */
+    .authors-strip{
+      background:linear-gradient(135deg,rgba(124,58,237,.18),rgba(5,150,105,.18));
+      position:relative;overflow:hidden;
+    }
+    .authors-strip::after{
+      content:'';position:absolute;right:-20px;top:-20px;
+      width:120px;height:120px;border-radius:50%;
+      background:radial-gradient(circle,rgba(124,58,237,.08),transparent 70%);
+    }
+
+    /* ====== ANIMATED BADGE ====== */
+    .landing-badge{
+      animation:badgePulse 3s ease-in-out infinite;
+    }
+    @keyframes badgePulse{
+      0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.4)}
+      50%{box-shadow:0 0 0 8px rgba(245,158,11,0)}
+    }
+
+    /* ====== TAB BAR GLOW ====== */
+
+    /* ====== STAGGERED ENTRY for feat-cards ====== */
+    .feat-card:nth-child(1){animation-delay:.05s}
+    .feat-card:nth-child(2){animation-delay:.1s}
+    .feat-card:nth-child(3){animation-delay:.15s}
+    .feat-card:nth-child(4){animation-delay:.2s}
+    .feat-card:nth-child(5){animation-delay:.25s}
+    .feat-card:nth-child(6){animation-delay:.3s}
+    @keyframes cardEntry{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+    .feat-card{animation:cardEntry .5s cubic-bezier(.22,1,.36,1) both}
+
+    /* ====== SCROLL-REVEAL ====== */
+    .reveal{opacity:0;transform:translateY(28px);transition:opacity .55s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.22,1,.36,1)}
+    .reveal.visible{opacity:1;transform:translateY(0)}
+
+    /* ====== NOISE TEXTURE OVERLAY ====== */
+    body::after{
+      content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+      opacity:.018;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* ====== PARTICLE COLORS UPDATE ====== */
+    .p-dot{filter:blur(1px)}
+
+    /* ====== ENTERING APP TRANSITION ====== */
+    @keyframes appReveal{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
+    #mainApp.entering{animation:appReveal .45s cubic-bezier(.22,1,.36,1) both}
+
+    /* ====== NAV PILL INDICATOR ====== */
+    .nav{position:relative}
+
+    /* ====== CHIP HOVER ====== */
+    .chip{transition:transform .15s,background .15s}
+    .chip:hover{transform:scale(1.07)}
+
+    /* ====== ENTER BTN PULSE ====== */
+    .enter-btn{position:relative;overflow:hidden}
+    .enter-btn::after{
+      content:'';position:absolute;inset:0;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);
+      transform:translateX(-100%);
+      animation:btnShine 2.5s ease-in-out infinite 1s;
+    }
+    @keyframes btnShine{0%{transform:translateX(-100%)}40%,100%{transform:translateX(200%)}}
+
+    @media(max-width:900px){
+      .landing-cells{display:none}
+    }
+    @media(max-width:700px){
+      .wrap{padding:14px}
+      .landing-content{padding:30px 20px 30px}
+      .landing-title{font-size:3rem}
+      .hero{padding:28px 20px}
+      .speech,.thought,.shout{font-size:.7rem;padding:5px 7px}
+      .scene-top{padding:8px}
+      .scene-art{min-height:120px}
+      .ctable{font-size:.9rem;display:block;overflow-x:auto}
+    }
+  </style>
+</head>
+<body>
+<canvas id="bgCanvas"></canvas>
+<div id="cursorGlow"></div>
+<div id="cursorDot"></div>
+<div class="wrap">
+
+  <!-- ====== LANDING PAGE ====== -->
+  <div id="landingPage">
+
+    <!-- HERO -->
+    <div class="landing-hero">
+      <div class="landing-bg"></div>
+      <div class="landing-particles" id="particles"></div>
+
+      <!-- Decorative SVG illustration -->
+      <svg class="landing-cells" viewBox="0 0 560 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Virus 1 -->
+        <circle cx="120" cy="120" r="54" fill="rgba(230,57,70,.18)" stroke="rgba(230,57,70,.5)" stroke-width="4"/>
+        <circle cx="120" cy="120" r="34" fill="rgba(230,57,70,.15)" stroke="rgba(230,57,70,.4)" stroke-width="3"/>
+        <circle cx="120" cy="120" r="14" fill="rgba(230,57,70,.3)"/>
+        <line x1="120" y1="66" x2="120" y2="48" stroke="rgba(230,57,70,.6)" stroke-width="3"/><circle cx="120" cy="42" r="6" fill="#e63946"/>
+        <line x1="159" y1="81" x2="171" y2="69" stroke="rgba(230,57,70,.6)" stroke-width="3"/><circle cx="177" cy="63" r="6" fill="#e63946"/>
+        <line x1="174" y1="120" x2="192" y2="120" stroke="rgba(230,57,70,.6)" stroke-width="3"/><circle cx="198" cy="120" r="6" fill="#e63946"/>
+        <line x1="159" y1="159" x2="171" y2="171" stroke="rgba(230,57,70,.6)" stroke-width="3"/><circle cx="177" cy="177" r="6" fill="#e63946"/>
+        <line x1="120" y1="174" x2="120" y2="192" stroke="rgba(230,57,70,.6)" stroke-width="3"/><circle cx="120" cy="198" r="6" fill="#e63946"/>
+        <line x1="81" y1="159" x2="69" y2="171" stroke="rgba(230,57,70,.6)" stroke-width="3"/><circle cx="63" cy="177" r="6" fill="#e63946"/>
+        <line x1="66" y1="120" x2="48" y2="120" stroke="rgba(230,57,70,.6)" stroke-width="3"/><circle cx="42" cy="120" r="6" fill="#e63946"/>
+        <line x1="81" y1="81" x2="69" y2="69" stroke="rgba(230,57,70,.6)" stroke-width="3"/><circle cx="63" cy="63" r="6" fill="#e63946"/>
+        <!-- Bacteria 1 -->
+        <ellipse cx="370" cy="180" rx="90" ry="58" fill="rgba(42,157,143,.15)" stroke="rgba(42,157,143,.5)" stroke-width="4"/>
+        <ellipse cx="370" cy="180" rx="66" ry="40" fill="rgba(42,157,143,.12)" stroke="rgba(42,157,143,.35)" stroke-width="3"/>
+        <ellipse cx="370" cy="180" rx="30" ry="18" fill="rgba(230,57,70,.2)" stroke="rgba(230,57,70,.4)" stroke-width="2"/>
+        <path d="M460 192 C520 210,545 260,530 300" fill="none" stroke="rgba(42,157,143,.5)" stroke-width="5" stroke-linecap="round"/>
+        <circle cx="310" cy="165" r="5" fill="rgba(124,58,237,.5)"/>
+        <circle cx="340" cy="195" r="4" fill="rgba(124,58,237,.5)"/>
+        <circle cx="390" cy="163" r="5" fill="rgba(124,58,237,.5)"/>
+        <circle cx="415" cy="188" r="4" fill="rgba(124,58,237,.5)"/>
+        <!-- Virus 2 small -->
+        <circle cx="460" cy="80" r="32" fill="rgba(230,57,70,.12)" stroke="rgba(230,57,70,.4)" stroke-width="3"/>
+        <circle cx="460" cy="80" r="18" fill="rgba(230,57,70,.1)" stroke="rgba(230,57,70,.3)" stroke-width="2"/>
+        <circle cx="460" cy="80" r="7" fill="rgba(230,57,70,.25)"/>
+        <line x1="460" y1="48" x2="460" y2="38" stroke="rgba(230,57,70,.5)" stroke-width="2"/><circle cx="460" cy="34" r="5" fill="#e63946" opacity=".6"/>
+        <line x1="492" y1="80" x2="502" y2="80" stroke="rgba(230,57,70,.5)" stroke-width="2"/><circle cx="506" cy="80" r="5" fill="#e63946" opacity=".6"/>
+        <line x1="460" y1="112" x2="460" y2="122" stroke="rgba(230,57,70,.5)" stroke-width="2"/><circle cx="460" cy="126" r="5" fill="#e63946" opacity=".6"/>
+        <line x1="428" y1="80" x2="418" y2="80" stroke="rgba(230,57,70,.5)" stroke-width="2"/><circle cx="414" cy="80" r="5" fill="#e63946" opacity=".6"/>
+        <!-- Bacteria 2 small -->
+        <ellipse cx="200" cy="360" rx="60" ry="36" fill="rgba(42,157,143,.12)" stroke="rgba(42,157,143,.4)" stroke-width="3"/>
+        <ellipse cx="200" cy="360" rx="40" ry="22" fill="rgba(42,157,143,.1)" stroke="rgba(42,157,143,.3)" stroke-width="2"/>
+        <ellipse cx="200" cy="360" rx="16" ry="10" fill="rgba(230,57,70,.15)" stroke="rgba(230,57,70,.3)" stroke-width="2"/>
+        <path d="M260 370 C300 380,310 410,296 436" fill="none" stroke="rgba(42,157,143,.4)" stroke-width="4" stroke-linecap="round"/>
+        <!-- Small dots -->
+        <circle cx="310" cy="320" r="8" fill="rgba(244,162,97,.25)" stroke="rgba(244,162,97,.5)" stroke-width="2"/>
+        <circle cx="490" cy="310" r="10" fill="rgba(42,157,143,.2)" stroke="rgba(42,157,143,.4)" stroke-width="2"/>
+        <circle cx="80" cy="290" r="7" fill="rgba(230,57,70,.2)" stroke="rgba(230,57,70,.4)" stroke-width="2"/>
+      </svg>
+
+      <div class="landing-content">
+        <div class="landing-badge">🔬 Biologie interactivă · Clasa a IX-a</div>
+        <div class="landing-title">
+          <span class="v">Viruși</span><span class="amp">&</span><span class="b">Bacterii</span><br>
+          <span style="color:rgba(255,255,255,.85);font-size:clamp(1.8rem,4vw,3.5rem)">O lume invizibilă</span>
+        </div>
+        <p class="landing-sub">Explorează lumea microscopică prin lecții interactive, diagrame detaliate, o bandă desenată și un joc interactiv in loc de un test banal.</p>
+        <div class="landing-chips">
+          <span class="chip red">🦠 Structura virusurilor</span>
+          <span class="chip teal">🔵 Structura bacteriilor</span>
+          <span class="chip">📊 Comparație detaliată</span>
+          <span class="chip">🎨 Bandă desenată</span>
+          <span class="chip gold">🧠Joc interactiv</span>
+        </div>
+        <button class="enter-btn" onclick="enterApp()">
+          Intră în lecție ▶
+        </button>
+      </div>
+    </div>
+
+    <!-- AUTHORS -->
+    <div class="authors-strip">
+      <div style="font-size:2rem">🏆</div>
+      <div>
+        <div style="font-weight:800;font-size:1.05rem;color:#e8eeff"><strong>Burcuș Mihail</strong> și <strong>Vlaicu Eduard Ștefan</strong></div>
+        <div style="font-family:'Bangers',cursive;font-size:1.1rem;letter-spacing:.04em;color:rgba(232,238,255,.7)">Clasa a IX-a · Liceul Teoretic „Panait Cerna" Brăila</div>
+        <div style="font-size:.92rem;color:rgba(232,238,255,.65);margin-top:4px">Profesori coordonatori: <strong style="color:#e8eeff">Ion Aurelia</strong> și <strong style="color:#e8eeff">Gurzu Nicoleta Liliana</strong></div>
+      </div>
+    </div>
+
+    <!-- FEATURE CARDS -->
+    <div class="landing-features">
+      <div class="feat-card" onclick="enterApp('intro')">
+        <div class="accent acc-teal"></div>
+        <span class="ficon">📖</span>
+        <h3>Introducere</h3>
+        <p>Noțiuni de bază despre virusuri și bacterii: ce sunt, cum funcționează și de ce contează.</p>
+      </div>
+      <div class="feat-card" onclick="enterApp('comparatie')">
+        <div class="accent acc-pur"></div>
+        <span class="ficon">⚖️</span>
+        <h3>Comparație</h3>
+        <p>Tabel comparativ complet: organizare, material genetic, metabolism, tratament și exemple.</p>
+      </div>
+      <div class="feat-card" onclick="enterApp('structuri')">
+        <div class="accent acc-red"></div>
+        <span class="ficon">🔬</span>
+        <h3>Structuri interactive</h3>
+        <p>Apasă pe oricare parte a figurii și descoperă rolul său în organism.</p>
+      </div>
+      <div class="feat-card" onclick="enterApp('banda')">
+        <div class="accent acc-gold"></div>
+        <span class="ficon">🎨</span>
+        <h3>Bandă desenată</h3>
+        <p>Urmărește aventurile lui Viru și Bacty în 6 scene pline de umor și știință.</p>
+      </div>
+      <div class="feat-card" onclick="enterApp('simulare')">
+        <div class="accent acc-blue"></div>
+        <span class="ficon">🧬</span>
+        <h3>Simulare NextLab</h3>
+        <p>Simulator pentru detecția culorilor cu kit Arduino — viruși vs. bacterii.</p>
+      </div>
+      <div class="feat-card" onclick="enterApp('test')">
+        <div class="accent acc-pink"></div>
+        <span class="ficon">🧠</span>
+        <h3>Test interactiv</h3>
+        <p>10 întrebări cu hotspot și alegere multiplă. Poți schimba răspunsul înainte de confirmare!</p>
+      </div>
+    </div>
+
+  </div><!-- /landingPage -->
+
+  <!-- ====== MAIN APP ====== -->
+  <div id="mainApp">
+    <button class="back-btn" onclick="goBack()">← Înapoi la pagina de start</button>
+
+    <div class="project-banner" style="margin-bottom:22px">
+      <div style="background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.18);border-radius:20px;box-shadow:6px 6px 0 rgba(0,0,0,.4);padding:14px 22px;text-align:center">
+        <div style="font-weight:800;font-size:1rem;color:#e8eeff">Burcuș Mihail &amp; Vlaicu Eduard Ștefan · Clasa a IX-a · Liceul Teoretic „Panait Cerna" Brăila</div>
+        <div style="font-size:.9rem;color:rgba(232,238,255,.65);margin-top:4px">Profesori coordonatori: <strong style="color:#e8eeff">Ion Aurelia</strong> și <strong style="color:#e8eeff">Gurzu Nicoleta Liliana</strong></div>
+      </div>
+    </div>
+
+    <header class="hero">
+      <small>🔬 Biologie interactivă · Clasa a IX-a</small>
+      <h1><span class="v">Viruși</span> și <span class="b">Bacterii</span><br>O lume invizibilă</h1>
+      <p>Pagină interactivă pentru recapitulare și evaluare: noțiuni teoretice, comparație, structuri, bandă desenată și un joc interactiv in loc de un test banal.</p>
+      <div class="badges">
+        <span class="badge v">🦠 Virusuri</span>
+        <span class="badge b">🔵 Bacterii</span>
+        <span class="badge g">🧠 Test interactiv</span>
+      </div>
+    </header>
+
+    <nav class="nav">
+      <button class="tab on" onclick="showTab('intro',this)">Introducere</button>
+      <button class="tab" onclick="showTab('comparatie',this)">Comparație</button>
+      <button class="tab" onclick="showTab('structuri',this)">Structuri</button>
+      <button class="tab" onclick="showTab('banda',this)">Bandă desenată</button>
+      <button class="tab" onclick="showTab('simulare',this)">🧬 Simulare</button>
+      <button class="tab" onclick="showTab('test',this)">🎮 Joc interactiv</button>
+    </nav>
+
+    <!-- INTRODUCERE -->
+    <section id="intro" class="sec on">
+      <div class="grid2">
+        <article class="card"><div class="topbar v"></div><div class="emoji">🦠</div><h3>Ce sunt virusurile?</h3><p>Virusurile sunt entități acelulare, alcătuite din material genetic și un înveliș proteic. Nu au metabolism propriu și se multiplică numai în interiorul unei celule-gazdă.</p></article>
+        <article class="card"><div class="topbar b"></div><div class="emoji">🔵</div><h3>Ce sunt bacteriile?</h3><p>Bacteriile sunt organisme unicelulare procariote. Au membrană, citoplasmă, ribozomi și ADN propriu, iar multe se reproduc independent prin fisiune binară.</p></article>
+        <article class="card"><div class="topbar g"></div><div class="emoji">⚖️</div><h3>Diferența esențială</h3><p>Virusul depinde de gazdă pentru multiplicare, pe când bacteria este o celulă vie capabilă de activitate metabolică proprie și de reproducere independentă.</p></article>
+        <article class="card"><div class="topbar p"></div><div class="emoji">🛡️</div><h3>Importanță medicală</h3><p>Antibioticele acționează asupra bacteriilor sensibile, nu asupra virusurilor. Împotriva infecțiilor virale sunt importante vaccinurile, antiviralele și prevenția.</p></article>
+      </div>
+    </section>
+
+    <!-- COMPARATIE -->
+    <section id="comparatie" class="sec">
+      <div class="stitle"><h2>Virusuri vs. bacterii</h2><p>Tabel comparativ pentru recapitulare rapidă.</p></div>
+      <table class="ctable">
+        <thead><tr><th>Caracteristică</th><th>🦠 Virusuri</th><th>🔵 Bacterii</th></tr></thead>
+        <tbody>
+          <tr><td>Organizare</td><td>Acelulară</td><td>Celulară procariotă</td></tr>
+          <tr><td>Material genetic</td><td>ADN sau ARN</td><td>ADN circular dublu catenar</td></tr>
+          <tr><td>Ribozomi</td><td>Absenți</td><td>Prezenți</td></tr>
+          <tr><td>Metabolism</td><td>Absent</td><td>Prezent</td></tr>
+          <tr><td>Reproducere</td><td>În celula-gazdă</td><td>Fisiune binară</td></tr>
+          <tr><td>Dimensiuni</td><td>Mai mici</td><td>Mai mari</td></tr>
+          <tr><td>Tratament</td><td>Vaccinuri / antivirale</td><td>Antibiotice, dacă sunt sensibile</td></tr>
+          <tr><td>Exemple</td><td>Gripă, rujeolă, COVID-19</td><td>Streptococ, Salmonella, E. coli</td></tr>
+        </tbody>
+      </table>
+      <div class="grid2">
+        <article class="card"><div class="topbar v"></div><h3>Asemănări</h3><p>Ambele sunt microscopice, pot produce boli și pot fi răspândite prin contact direct, aer, apă sau suprafețe contaminate.</p></article>
+        <article class="card"><div class="topbar b"></div><h3>Măsuri de protecție</h3><p>Igiena mâinilor, aerisirea, vaccinarea, folosirea corectă a antibioticelor și evitarea automedicației sunt esențiale.</p></article>
+      </div>
+    </section>
+
+    <!-- STRUCTURI -->
+    <section id="structuri" class="sec">
+      <div class="stitle"><h2>Structuri interactive</h2><p>Apasă pe elementele figurii sau pe butoanele din legendă pentru explicații.</p></div>
+      <div class="grid2">
+        <article class="panel">
+          <h3>🦠 Structura unui virus</h3>
+          <svg viewBox="0 0 640 420">
+            <defs>
+              <radialGradient id="virusOuter" cx="50%" cy="50%" r="60%"><stop offset="0%" stop-color="#bfdcff"/><stop offset="100%" stop-color="#6ea8ff"/></radialGradient>
+              <radialGradient id="virusInner" cx="50%" cy="50%" r="60%"><stop offset="0%" stop-color="#ffb4bf"/><stop offset="100%" stop-color="#ff758e"/></radialGradient>
+            </defs>
+            <g id="virusSpikes"></g>
+            <circle id="virusEnvelope" class="clickable" cx="320" cy="210" r="120" fill="url(#virusOuter)" stroke="#1d4ed8" stroke-width="9" onclick="selectVirus('anvelopa')"></circle>
+            <circle id="virusCapsid" class="clickable" cx="320" cy="210" r="86" fill="#e0f2fe" stroke="#0f766e" stroke-width="8" onclick="selectVirus('capsida')"></circle>
+            <path id="virusGenetic" class="clickable" d="M270 205 C292 155,350 155,372 205 C352 260,290 260,270 205 Z" fill="url(#virusInner)" stroke="#9f1239" stroke-width="6" onclick="selectVirus('materialGenetic')"></path>
+            <line x1="136" y1="78" x2="220" y2="145" stroke="#475569" stroke-width="2" stroke-dasharray="4 3"></line>
+            <rect x="40" y="64" width="110" height="28" rx="8" fill="#fff" stroke="#94a3b8" class="clickable" onclick="selectVirus('spiculi')"></rect>
+            <text x="95" y="82" text-anchor="middle" dominant-baseline="middle" class="svg-box-label">Spiculi</text>
+            <line x1="142" y1="207" x2="210" y2="207" stroke="#475569" stroke-width="2" stroke-dasharray="4 3"></line>
+            <rect x="40" y="192" width="112" height="28" rx="8" fill="#fff" stroke="#94a3b8" class="clickable" onclick="selectVirus('anvelopa')"></rect>
+            <text x="96" y="210" text-anchor="middle" dominant-baseline="middle" class="svg-box-label">Anvelopă</text>
+            <line x1="164" y1="334" x2="240" y2="266" stroke="#475569" stroke-width="2" stroke-dasharray="4 3"></line>
+            <rect x="56" y="320" width="118" height="28" rx="8" fill="#fff" stroke="#94a3b8" class="clickable" onclick="selectVirus('capsida')"></rect>
+            <text x="115" y="338" text-anchor="middle" dominant-baseline="middle" class="svg-box-label">Capsidă</text>
+            <line x1="454" y1="352" x2="394" y2="250" stroke="#475569" stroke-width="2" stroke-dasharray="4 3"></line>
+            <rect x="454" y="366" width="156" height="28" rx="8" fill="#fff" stroke="#94a3b8" class="clickable" onclick="selectVirus('materialGenetic')"></rect>
+            <text x="532" y="384" text-anchor="middle" dominant-baseline="middle" class="svg-box-label">Material genetic</text>
+          </svg>
+          <div class="legend" id="virusLegend">
+            <button id="virusBtn-materialGenetic" onclick="selectVirus('materialGenetic')">Material genetic</button>
+            <button id="virusBtn-capsida" onclick="selectVirus('capsida')">Capsidă</button>
+            <button id="virusBtn-anvelopa" onclick="selectVirus('anvelopa')">Anvelopă</button>
+            <button id="virusBtn-spiculi" onclick="selectVirus('spiculi')">Spiculi</button>
+          </div>
+          <div class="info" id="virusInfo"><p>Selectează un element.</p></div>
+        </article>
+
+        <article class="panel">
+          <h3>🔵 Structura unei bacterii</h3>
+          <svg viewBox="0 0 720 450">
+            <ellipse id="bactCapsule" class="clickable" cx="300" cy="220" rx="170" ry="105" fill="#d1fae5" stroke="#10b981" stroke-width="8" onclick="selectBacteria('capsula')"></ellipse>
+            <ellipse id="bactWall" class="clickable" cx="300" cy="220" rx="148" ry="88" fill="#bbf7d0" stroke="#22c55e" stroke-width="8" onclick="selectBacteria('perete')"></ellipse>
+            <ellipse id="bactMembrane" class="clickable" cx="300" cy="220" rx="128" ry="72" fill="#ecfccb" stroke="#65a30d" stroke-width="6" onclick="selectBacteria('membrana')"></ellipse>
+            <ellipse id="bactCytoplasm" class="clickable" cx="300" cy="220" rx="116" ry="60" fill="#fef9c3" stroke="#ca8a04" stroke-width="2" onclick="selectBacteria('citoplasma')"></ellipse>
+            <path id="bactNucleoid" class="clickable" d="M250 220 C270 180,342 180,366 220 C340 265,272 265,250 220 Z" fill="#fda4af" stroke="#be123c" stroke-width="6" onclick="selectBacteria('nucleoid')"></path>
+            <path id="bactFlagel" class="clickable" d="M470 240 C540 270,575 320,560 360 C548 390,595 410,638 392" fill="none" stroke="#2563eb" stroke-width="8" stroke-linecap="round" onclick="selectBacteria('flagel')"></path>
+            <g id="bactRibosomes"></g>
+            <g id="bactPili"></g>
+            <rect x="24" y="62" width="114" height="30" rx="8" fill="#fff" stroke="#94a3b8" class="clickable" onclick="selectBacteria('capsula')"></rect>
+            <text x="48" y="82" font-size="14" font-weight="800">Capsulă</text>
+            <line x1="138" y1="78" x2="182" y2="132" stroke="#475569" stroke-width="2" stroke-dasharray="4 3"></line>
+            <rect x="10" y="140" width="128" height="30" rx="8" fill="#fff" stroke="#94a3b8" class="clickable" onclick="selectBacteria('perete')"></rect>
+            <text x="22" y="160" font-size="14" font-weight="800">Perete celular</text>
+            <line x1="140" y1="154" x2="176" y2="175" stroke="#475569" stroke-width="2" stroke-dasharray="4 3"></line>
+            <rect x="2" y="216" width="160" height="30" rx="8" fill="#fff" stroke="#94a3b8" class="clickable" onclick="selectBacteria('membrana')"></rect>
+            <text x="16" y="236" font-size="14" font-weight="800">Membrană celulară</text>
+            <line x1="164" y1="230" x2="170" y2="230" stroke="#475569" stroke-width="2" stroke-dasharray="4 3"></line>
+            <rect x="28" y="314" width="110" height="30" rx="8" fill="#fff" stroke="#94a3b8" class="clickable" onclick="selectBacteria('citoplasma')"></rect>
+            <text x="42" y="334" font-size="14" font-weight="800">Citoplasmă</text>
+            <line x1="140" y1="328" x2="205" y2="275" stroke="#475569" stroke-width="2" stroke-dasharray="4 3"></line>
+            <rect x="566" y="86" width="104" height="30" rx="8" fill="#fff" stroke="#94a3b8" class="clickable" onclick="selectBacteria('nucleoid')"></rect>
+            <text x="585" y="106" font-size="14" font-weight="800">Nucleoid</text>
+            <line x1="568" y1="110" x2="372" y2="205" stroke="#475569" stroke-width="2" stroke-dasharray="4 3"></line>
+            <rect x="572" y="170" width="98" height="30" rx="8" fill="#fff" stroke="#94a3b8" class="clickable" onclick="selectBacteria('ribozomi')"></rect>
+            <text x="590" y="190" font-size="14" font-weight="800">Ribozomi</text>
+            <line x1="572" y1="186" x2="405" y2="214" stroke="#475569" stroke-width="2" stroke-dasharray="4 3"></line>
+            <rect x="582" y="246" width="84" height="30" rx="8" fill="#fff" stroke="#94a3b8" class="clickable" onclick="selectBacteria('flagel')"></rect>
+            <text x="600" y="266" font-size="14" font-weight="800">Flagel</text>
+            <line x1="582" y1="262" x2="470" y2="250" stroke="#475569" stroke-width="2" stroke-dasharray="4 3"></line>
+            <rect x="586" y="318" width="68" height="30" rx="8" fill="#fff" stroke="#94a3b8" class="clickable" onclick="selectBacteria('pili')"></rect>
+            <text x="607" y="338" font-size="14" font-weight="800">Pili</text>
+            <line x1="586" y1="332" x2="160" y2="290" stroke="#475569" stroke-width="2" stroke-dasharray="4 3"></line>
+          </svg>
+          <div class="legend" id="bactLegend">
+            <button id="bactBtn-capsula" onclick="selectBacteria('capsula')">Capsulă</button>
+            <button id="bactBtn-perete" onclick="selectBacteria('perete')">Perete celular</button>
+            <button id="bactBtn-membrana" onclick="selectBacteria('membrana')">Membrană</button>
+            <button id="bactBtn-citoplasma" onclick="selectBacteria('citoplasma')">Citoplasmă</button>
+            <button id="bactBtn-nucleoid" onclick="selectBacteria('nucleoid')">Nucleoid</button>
+            <button id="bactBtn-ribozomi" onclick="selectBacteria('ribozomi')">Ribozomi</button>
+            <button id="bactBtn-flagel" onclick="selectBacteria('flagel')">Flagel</button>
+            <button id="bactBtn-pili" onclick="selectBacteria('pili')">Pili</button>
+          </div>
+          <div class="info" id="bactInfo"><p>Selectează un element.</p></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- BANDA DESENATA -->
+    <section id="banda" class="sec">
+      <div class="comic-head"><h2>🎨 Aventurile lui <em>Viru</em> și <em>Bacty</em></h2></div>
+      <div class="progressWrap">
+        <div class="progressLabel" id="sceneLabel">Scena 1 din 6</div>
+        <div class="bar"><div class="fill" id="sceneFill"></div></div>
+      </div>
+      <div class="controls">
+        <button class="restart" onclick="restartComic()">↩ Restart</button>
+        <button class="prev" id="prevBtn" onclick="prevScene()" disabled>◀ Înapoi</button>
+        <button class="next" id="nextBtn" onclick="nextScene()">Înainte ▶</button>
+      </div>
+      <div id="comicBox"></div>
+    </section>
+
+    <!-- SIMULARE -->
+    <section id="simulare" class="sec">
+      <div class="stitle">
+        <h2>🧬 Detector Color - Viruși vs Bacterii</h2>
+        <p>Simulare interactivă cu kit NextLab GREEN: detectează virusuri (roșu) și bacterii (verde) folosind senzori optici.</p>
+      </div>
+      <div class="simulare-note">
+        ⚠️ Aceasta este o simulare educativă a unui detector de culori bazat pe kit-ul NextLab GREEN (ATMEGA328PB). Alege o culoare și observă cum senzorul fotodiodă clasifică proba.
+      </div>
+      <div class="grid2">
+        <div class="panel" style="grid-column:1/-1">
+          <h3>🔴 Simulatorul Detectorului de Culoare</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:20px 0">
+            <div>
+              <h4 style="font-family:'Bangers',cursive;margin-bottom:12px">1️⃣ Selectare culoare</h4>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+                <button onclick="setSimulatorColor('#FF4444')" style="background:#FF4444;color:#fff;padding:12px 16px;border-radius:8px;border:3px solid #1a1a2e;font-weight:800;cursor:pointer">🦠 Roșu</button>
+                <button onclick="setSimulatorColor('#44FF44')" style="background:#44FF44;color:#000;padding:12px 16px;border-radius:8px;border:3px solid #1a1a2e;font-weight:800;cursor:pointer">🔵 Verde</button>
+                <button onclick="setSimulatorColor('#FFFF44')" style="background:#FFFF44;color:#000;padding:12px 16px;border-radius:8px;border:3px solid #1a1a2e;font-weight:800;cursor:pointer">⚠️ Galben</button>
+                <button onclick="setSimulatorColor('#CCCCCC')" style="background:#CCCCCC;color:#000;padding:12px 16px;border-radius:8px;border:3px solid #1a1a2e;font-weight:800;cursor:pointer">◯ Gri</button>
+              </div>
+              <label style="display:block;font-weight:800;margin-bottom:8px">Culoare personalizată:</label>
+              <input type="color" id="colorPicker" value="#FF4444" onchange="setSimulatorColor(this.value)" style="width:100%;height:60px;border:3px solid #1a1a2e;border-radius:8px;cursor:pointer">
+            </div>
+            <div>
+              <h4 style="font-family:'Bangers',cursive;margin-bottom:12px">2️⃣ Citire senzor</h4>
+              <div id="sensorReading" style="background:var(--cream);border:3px solid #1a1a2e;border-radius:12px;padding:20px;min-height:150px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;box-shadow:4px 4px 0 #1a1a2e">
+                <div id="sensorColor" style="width:60px;height:60px;background:#FF4444;border-radius:50%;border:4px solid #1a1a2e;margin-bottom:12px"></div>
+                <div id="sensorRGB" style="font-family:monospace;font-weight:800;color:#475569;margin-bottom:12px;font-size:.95rem">RGB: (255, 68, 68)</div>
+                <div id="sensorIntensity" style="font-weight:800;color:#1a1a2e;margin-bottom:8px">Intensitate: 68%</div>
+              </div>
+            </div>
+          </div>
+          <h4 style="font-family:'Bangers',cursive;margin-bottom:12px">3️⃣ Rezultat clasificare</h4>
+          <div id="detectionResult" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+            <div style="background:#fee2e2;border:3px solid #dc2626;border-radius:10px;padding:16px;text-align:center">
+              <div style="font-size:2rem;margin-bottom:8px">🦠</div>
+              <div style="font-weight:800;color:#991b1b;margin-bottom:4px">Virus</div>
+              <div id="virusScore" style="font-size:1.5rem;font-weight:900;color:#dc2626">92%</div>
+            </div>
+            <div style="background:#fef9c3;border:3px solid #9ca3af;border-radius:10px;padding:16px;text-align:center;opacity:0.5">
+              <div style="font-size:2rem;margin-bottom:8px">❓</div>
+              <div style="font-weight:800;color:#6b7280;margin-bottom:4px">Incert</div>
+              <div id="uncertainScore" style="font-size:1.5rem;font-weight:900;color:#6b7280">0%</div>
+            </div>
+            <div style="background:#dcfce7;border:3px solid #16a34a;border-radius:10px;padding:16px;text-align:center;opacity:0.5">
+              <div style="font-size:2rem;margin-bottom:8px">🔵</div>
+              <div style="font-weight:800;color:#15803d;margin-bottom:4px">Bacterie</div>
+              <div id="bacteriaScore" style="font-size:1.5rem;font-weight:900;color:#16a34a">0%</div>
+            </div>
+          </div>
+          <div id="explanation" style="background:var(--cream);border:2px dashed #f4a261;border-radius:12px;padding:16px;margin-top:16px;color:#334155">
+            <strong style="color:#d97706">💡 Explicație:</strong> Senzorul fotodiodă măsoară intensitatea luminii reflectate. Culoarea roșie indică prezența unui virus, culoarea verde indică o bacterie.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TEST / JOC INTERACTIV -->
+    <section id="test" class="sec">
+      <div class="stitle">
+        <h2>🎮 Joc educațional interactiv</h2>
+        <p>Alege un mod de joc și exersează — 5 stiluri de învățare combinate!</p>
+      </div>
+
+      <!-- ===== REWARD OVERLAY ===== -->
+      <div id="gameRewardOverlay" style="display:none;position:fixed;inset:0;background:rgba(10,22,40,.72);display:none;align-items:center;justify-content:center;z-index:9999">
+        <div style="background:rgba(15,31,61,.95);border:2px solid rgba(255,255,255,.2);box-shadow:6px 6px 0 rgba(0,0,0,.6);border-radius:24px;padding:36px 40px;text-align:center;max-width:380px;animation:popIn .35s cubic-bezier(.17,.67,.35,1.4)">
+          <div id="gRewardEmoji" style="font-size:4rem;margin-bottom:12px">🏆</div>
+          <h3 id="gRewardTitle" style="font-family:'Bangers',cursive;font-size:2.2rem;letter-spacing:.04em;margin-bottom:8px">Bravo!</h3>
+          <p id="gRewardMsg" style="font-family:'Merriweather',serif;color:#475569;line-height:1.7;margin-bottom:18px">Felicitări!</p>
+          <button onclick="gCloseReward()" style="border:3px solid #0f1f3d;border-radius:10px;padding:10px 28px;font-family:'Bangers',cursive;font-size:1.1rem;letter-spacing:.04em;cursor:pointer;background:#f59e0b;box-shadow:4px 4px 0 #0f1f3d">Continuă ▶</button>
+        </div>
+      </div>
+      <style>
+        @keyframes popIn{from{transform:scale(.6)}to{transform:scale(1)}}
+        .gmode-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:10px}
+        .gmode-card{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.18);box-shadow:5px 5px 0 rgba(0,0,0,.5);border-radius:16px;padding:20px 18px;cursor:pointer;position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s}
+        .gmode-card:hover{transform:translate(-3px,-3px);box-shadow:8px 8px 0 rgba(0,0,0,.6)}
+        .gmode-card .gmc-top{height:5px;position:absolute;top:0;left:0;right:0}
+        .gmc-v .gmc-top{background:#7c3aed}.gmc-b .gmc-top{background:#059669}.gmc-g .gmc-top{background:#f59e0b}.gmc-s .gmc-top{background:#3b82f6}.gmc-r .gmc-top{background:#dc2626}
+        .gmode-card .gm-icon{font-size:2rem;margin-bottom:8px;display:block}
+        .gmode-card h4{font-family:'Bangers',cursive;font-size:1.2rem;letter-spacing:.04em;margin-bottom:4px;color:#e8eeff}
+        .gmode-card p{font-size:.82rem;color:rgba(232,238,255,.65);line-height:1.55;font-family:'Merriweather',serif}
+        .gmode-card .gm-tag{display:inline-block;margin-top:8px;font-size:.72rem;font-weight:900;letter-spacing:.06em;padding:2px 9px;border-radius:999px;border:2px solid currentColor}
+        .gmc-v .gm-tag{color:#a78bfa}.gmc-b .gm-tag{color:#34d399}.gmc-g .gm-tag{color:#fcd34d}.gmc-s .gm-tag{color:#7dd3fc}.gmc-r .gm-tag{color:#f87171}
+        /* Game screens inside the tab */
+        .gscreen{display:none}.gscreen.gactive{display:block;animation:secFadeSlide .35s cubic-bezier(.22,1,.36,1) both}
+        .g-topbar{display:flex;align-items:center;justify-content:space-between;background:#0f1f3d;color:#fff;padding:11px 18px;border-radius:14px;margin-bottom:16px;border:3px solid #0f1f3d;box-shadow:4px 4px 0 #0f1f3d}
+        .g-topbar .g-title{font-family:'Bangers',cursive;font-size:1.2rem;letter-spacing:.05em;color:#f59e0b}
+        .g-back{background:transparent;border:2px solid rgba(255,255,255,.35);color:#fff;border-radius:999px;padding:5px 13px;cursor:pointer;font-family:'Bangers',cursive;font-size:.9rem;letter-spacing:.04em}
+        .g-back:hover{background:rgba(255,255,255,.12)}
+        /* Flashcard */
+        .gfc-wrap{perspective:900px;display:flex;flex-direction:column;align-items:center;gap:16px}
+        .gfc-cardwrap{width:100%;max-width:560px;height:280px;perspective:900px;cursor:pointer}
+        .gfc-card{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,.2,.2,1)}
+        .gfc-card.flipped{transform:rotateY(180deg)}
+        .gfc-front,.gfc-back{position:absolute;inset:0;backface-visibility:hidden;border:3px solid #0f1f3d;border-radius:16px;box-shadow:5px 5px 0 #0f1f3d;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
+        .gfc-front{background:rgba(255,255,255,.09);color:#e8eeff}.gfc-back{background:#0f1f3d;color:#fff;transform:rotateY(180deg)}
+        .gfc-front .gfc-emoji{font-size:2.6rem;margin-bottom:10px}
+        .gfc-front .gfc-q{font-family:'Bangers',cursive;font-size:1.45rem;letter-spacing:.03em;line-height:1.2}
+        .gfc-front .gfc-hint{font-size:.82rem;color:#94a3b8;margin-top:8px;font-style:italic}
+        .gfc-back .gfc-ans{font-family:'Merriweather',serif;font-size:.98rem;line-height:1.75;color:rgba(255,255,255,.9)}
+        .gfc-back .gfc-tag{margin-top:12px;font-family:'Bangers',cursive;letter-spacing:.06em;font-size:.85rem;color:#f59e0b}
+        .gfc-nav{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center}
+        .gfc-nav button{border:2px solid rgba(255,255,255,.2);border-radius:999px;background:rgba(255,255,255,.1);color:#e8eeff;box-shadow:4px 4px 0 rgba(0,0,0,.4);padding:9px 20px;font-family:'Bangers',cursive;font-size:.95rem;letter-spacing:.04em;cursor:pointer;transition:transform .1s,box-shadow .1s}
+        .gfc-nav button:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 #0f1f3d}
+        .gfc-btn-v{background:#7c3aed!important;color:#fff!important;border-color:#7c3aed!important}
+        .gfc-btn-b{background:#059669!important;color:#fff!important;border-color:#059669!important}
+        .gprog{width:100%;max-width:560px;background:rgba(10,22,40,.1);border-radius:999px;height:7px;overflow:hidden}
+        .gprog-fill{height:100%;background:linear-gradient(90deg,#7c3aed,#059669);transition:width .3s}
+        /* Sort */
+        .gsort-arena{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+        .gsort-zone{background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.15);box-shadow:4px 4px 0 rgba(0,0,0,.4);border-radius:14px;min-height:170px;padding:14px}
+        .gsort-zone.gdrag-over{background:rgba(255,255,255,.14);border-style:dashed}
+        .gsort-zone h4{font-family:'Bangers',cursive;font-size:1.15rem;letter-spacing:.04em;margin-bottom:10px}
+        .gsort-zone.gv-zone h4{color:#7c3aed}.gsort-zone.gb-zone h4{color:#059669}
+        .gsort-bank{background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.12);box-shadow:4px 4px 0 rgba(0,0,0,.4);border-radius:14px;padding:14px;margin-bottom:14px}
+        .gsort-bank h4{font-family:'Bangers',cursive;font-size:.95rem;letter-spacing:.04em;margin-bottom:10px;color:rgba(232,238,255,.6)}
+        .gsort-items{display:flex;flex-wrap:wrap;gap:8px}
+        .gsort-chip{background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);border-radius:9px;padding:7px 12px;cursor:grab;font-weight:800;font-size:.85rem;transition:transform .15s,box-shadow .15s;box-shadow:3px 3px 0 rgba(0,0,0,.4);user-select:none;color:#e8eeff}
+        .gsort-chip:active{cursor:grabbing;transform:scale(1.06)}
+        .gsort-chip.gcorrect{background:#d1fae5;border-color:#059669;color:#059669}
+        .gsort-chip.gwrong{background:#fee2e2;border-color:#dc2626;color:#dc2626}
+        .gsort-actions{display:flex;gap:12px;justify-content:center}
+        .gsort-actions button{border:2px solid rgba(255,255,255,.2);border-radius:10px;padding:10px 22px;font-family:'Bangers',cursive;font-size:1rem;letter-spacing:.05em;cursor:pointer;box-shadow:4px 4px 0 rgba(0,0,0,.4);color:#e8eeff}
+        .gbtn-check{background:#7c3aed;color:#fff}.gbtn-reset{background:rgba(255,255,255,.1);color:#e8eeff}
+        .gsort-fb{text-align:center;margin-top:12px;padding:12px;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.15);box-shadow:4px 4px 0 rgba(0,0,0,.4);border-radius:14px;font-family:'Merriweather',serif;font-size:.92rem;line-height:1.65;display:none;color:#e8eeff}
+        /* Fill */
+        .gfill-card{background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.15);box-shadow:5px 5px 0 rgba(0,0,0,.4);border-radius:16px;padding:22px;max-width:640px;margin:0 auto 18px}
+        .gfill-card h4{font-family:'Bangers',cursive;font-size:1rem;letter-spacing:.04em;color:rgba(232,238,255,.55);margin-bottom:8px}
+        .gfill-sentence{font-family:'Merriweather',serif;font-size:1.05rem;line-height:2.1;color:#e8eeff}
+        .gfill-blank{display:inline-block;min-width:110px;border:none;border-bottom:3px solid rgba(255,255,255,.4);background:transparent;font-family:'Merriweather',serif;font-size:1rem;text-align:center;padding:2px 6px;outline:none;color:#a78bfa;font-weight:700;transition:border-color .2s}
+        .gfill-blank:focus{border-color:#7c3aed}
+        .gfill-blank.gbok{border-color:#059669;color:#34d399}.gfill-blank.gbbad{border-color:#dc2626;color:#f87171}
+        .gfill-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:6px}
+        .gfill-actions button{border:2px solid rgba(255,255,255,.2);border-radius:10px;padding:9px 20px;font-family:'Bangers',cursive;font-size:.95rem;letter-spacing:.04em;cursor:pointer;box-shadow:4px 4px 0 rgba(0,0,0,.4);color:#e8eeff}
+        .gfill-submit{background:#059669;color:#fff}.gfill-skip{background:rgba(255,255,255,.1);color:#e8eeff}
+        .gfill-fb{max-width:640px;margin:0 auto 14px;padding:12px 16px;border-radius:14px;border:2px solid;font-family:'Merriweather',serif;line-height:1.7;display:none}
+        .gfill-fb.gbok{background:rgba(5,150,105,.2);border-color:#059669;color:#6ee7b7}.gfill-fb.gbbad{background:rgba(220,38,38,.2);border-color:#dc2626;color:#fca5a5}
+        /* Match */
+        .gmatch-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+        .gmatch-grid > div > h5{font-family:'Bangers',cursive;font-size:.95rem;letter-spacing:.05em;color:rgba(232,238,255,.5);margin-bottom:8px}
+        .gmatch-item{background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.15);border-radius:11px;padding:11px 14px;cursor:pointer;font-weight:700;font-size:.88rem;margin-bottom:8px;transition:all .12s;line-height:1.4;color:#e8eeff}
+        .gmatch-item:hover:not(.glocked){background:rgba(255,255,255,.14);border-color:#7dd3fc;transform:translateX(2px)}
+        .gmatch-item.gsel-l{background:#ede9fe;border-color:#7c3aed;border-width:3px}
+        .gmatch-item.gsel-r{background:#eff6ff;border-color:#3b82f6;border-width:3px}
+        .gmatch-item.gmok{background:#d1fae5;border-color:#059669;border-width:2px;cursor:default}
+        .gmatch-item.gmbad{background:#fee2e2;border-color:#dc2626;animation:shake .4s}
+        .gmatch-item.glocked{cursor:default}
+        @keyframes shake{0%,100%{transform:none}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+        /* Quiz */
+        .gqcard{background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.15);box-shadow:5px 5px 0 rgba(0,0,0,.4);border-radius:16px;padding:22px}
+        .gqcard h3{font-size:1.15rem;line-height:1.55;margin-bottom:14px;font-weight:800;color:#e8eeff}
+        .gq-timer{font-family:'Bangers',cursive;font-size:.95rem;letter-spacing:.06em;float:right;color:#f87171;background:rgba(220,38,38,.25);border:2px solid rgba(220,38,38,.5);border-radius:999px;padding:2px 10px;margin-left:8px}
+        .gq-answers{display:grid;gap:9px}
+        .gq-ans{background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.15);border-radius:11px;padding:11px 14px;cursor:pointer;font-size:.95rem;font-weight:700;text-align:left;position:relative;transition:all .12s;color:#e8eeff}
+        .gq-ans:hover:not(.glocked){background:rgba(255,255,255,.14);border-color:#7dd3fc;transform:translateX(3px)}
+        .gq-ans.gsel{background:#eff6ff;border-color:#3b82f6;border-width:3px}
+        .gq-ans.gcorrect{background:#d1fae5;border-color:#059669;border-width:3px}
+        .gq-ans.gwrong{background:#fee2e2;border-color:#dc2626;border-width:3px}
+        .gq-fb{margin-top:12px;border-radius:12px;padding:11px 13px;font-weight:800;display:none;font-family:'Merriweather',serif;line-height:1.55}
+        .gq-fb.gbok{display:block;background:rgba(5,150,105,.25);border:2px solid #059669;color:#6ee7b7}
+        .gq-fb.gbbad{display:block;background:rgba(220,38,38,.25);border:2px solid #dc2626;color:#fca5a5}
+        .gq-ans.gsel{background:rgba(59,130,246,.25);border-color:#3b82f6;border-width:3px;color:#e8eeff}
+        .gq-ans.gcorrect{background:rgba(5,150,105,.25);border-color:#059669;border-width:3px;color:#6ee7b7}
+        .gq-ans.gwrong{background:rgba(220,38,38,.25);border-color:#dc2626;border-width:3px;color:#fca5a5}
+        .gq-next{display:none;margin-top:12px;border:2px solid rgba(255,255,255,.2);border-radius:10px;padding:9px 18px;font-family:'Bangers',cursive;font-size:.95rem;letter-spacing:.04em;cursor:pointer;background:#059669;color:#fff;box-shadow:4px 4px 0 rgba(0,0,0,.4)}
+        /* Result */
+        .gresult{text-align:center;padding:28px;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.15);box-shadow:5px 5px 0 rgba(0,0,0,.4);border-radius:16px;max-width:560px;margin:0 auto}
+        .gresult .gr-emoji{font-size:3.5rem;margin-bottom:10px}
+        .gresult h3{font-family:'Bangers',cursive;font-size:2rem;letter-spacing:.04em;margin-bottom:8px;color:#e8eeff}
+        .gresult .gr-score{font-size:1.25rem;font-weight:900;margin-bottom:12px;color:#e8eeff}
+        .gresult p{font-family:'Merriweather',serif;font-size:.93rem;line-height:1.7;color:rgba(232,238,255,.65)}
+        .gresult-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+        .gresult-btns button{border:2px solid rgba(255,255,255,.2);border-radius:10px;padding:10px 20px;font-family:'Bangers',cursive;font-size:1rem;letter-spacing:.04em;cursor:pointer;box-shadow:4px 4px 0 rgba(0,0,0,.4);color:#e8eeff}
+        .gbtn-again{background:#7c3aed;color:#fff}.gbtn-home2{background:rgba(255,255,255,.1);color:#e8eeff}
+        /* Stars */
+        .gstar{position:fixed;pointer-events:none;font-size:1.4rem;animation:gstarFly 1.2s ease-out forwards;z-index:9998}
+        @keyframes gstarFly{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(-100px) scale(.3)}}
+      </style>
+
+      <!-- HOME (mode selector) -->
+      <div class="gscreen gactive" id="gscreen-home">
+        <div class="gmode-grid">
+          <div class="gmode-card gmc-v" onclick="gStartMode('flash')">
+            <div class="gmc-top"></div><span class="gm-icon">🃏</span>
+            <h4>Flashcards</h4>
+            <p>Răstoarnă cardul și descoperă explicația. Prima lectură a noțiunilor.</p>
+            <span class="gm-tag">VIZUAL · CITIT</span>
+          </div>
+          <div class="gmode-card gmc-b" onclick="gStartMode('sort')">
+            <div class="gmc-top"></div><span class="gm-icon">🔀</span>
+            <h4>Sortare</h4>
+            <p>Trage fiecare caracteristică în categoria potrivită: virus sau bacterie.</p>
+            <span class="gm-tag">KINESTEZIC</span>
+          </div>
+          <div class="gmode-card gmc-g" onclick="gStartMode('fill')">
+            <div class="gmc-top"></div><span class="gm-icon">✍️</span>
+            <h4>Completează</h4>
+            <p>Completează spațiile din propoziții cu termenul corect.</p>
+            <span class="gm-tag">CITIT · SCRIS</span>
+          </div>
+          <div class="gmode-card gmc-s" onclick="gStartMode('match')">
+            <div class="gmc-top"></div><span class="gm-icon">🔗</span>
+            <h4>Potrivire</h4>
+            <p>Asociază fiecare structură cu funcția ei. Logică și memorie vizuală.</p>
+            <span class="gm-tag">VIZUAL · LOGIC</span>
+          </div>
+          <div class="gmode-card gmc-r" onclick="gStartMode('quiz')">
+            <div class="gmc-top"></div><span class="gm-icon">⚡</span>
+            <h4>Quiz Rapid</h4>
+            <p>10 întrebări cu cronometru de 20s. Verifică cât ai reținut sub presiune!</p>
+            <span class="gm-tag">EVALUARE</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- FLASHCARDS -->
+      <div class="gscreen" id="gscreen-flash">
+        <div class="g-topbar">
+          <button class="g-back" onclick="gGoHome()">← Înapoi</button>
+          <span class="g-title">🃏 Flashcards</span>
+          <span id="gfcCounterTop" style="font-family:'Bangers',cursive;font-size:.9rem;letter-spacing:.05em;color:rgba(255,255,255,.6)"></span>
+        </div>
+        <div class="gfc-wrap">
+          <div class="gprog"><div class="gprog-fill" id="gfcProgFill"></div></div>
+          <div style="font-family:'Bangers',cursive;font-size:.95rem;letter-spacing:.06em;color:#64748b" id="gfcCounter"></div>
+          <div class="gfc-cardwrap">
+            <div class="gfc-card" id="gfcCard" onclick="gFlipCard()">
+              <div class="gfc-front">
+                <span class="gfc-emoji" id="gfcEmoji"></span>
+                <div class="gfc-q" id="gfcQuestion"></div>
+                <div class="gfc-hint">Apasă pentru răspuns</div>
+              </div>
+              <div class="gfc-back">
+                <div class="gfc-ans" id="gfcAnswer"></div>
+                <div class="gfc-tag" id="gfcTag"></div>
+              </div>
+            </div>
+          </div>
+          <div style="text-align:center;font-size:.83rem;color:#64748b;font-weight:800" id="gfcKnown"></div>
+          <div class="gfc-nav">
+            <button onclick="gFcPrev()">◀ Înapoi</button>
+            <button class="gfc-btn-v" onclick="gFcMark(false)">✗ Nu știu</button>
+            <button class="gfc-btn-b" onclick="gFcMark(true)">✓ Știu!</button>
+            <button onclick="gFcNext()">Înainte ▶</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SORTARE -->
+      <div class="gscreen" id="gscreen-sort">
+        <div class="g-topbar">
+          <button class="g-back" onclick="gGoHome()">← Înapoi</button>
+          <span class="g-title">🔀 Sortare</span>
+          <span id="gSortScoreTop" style="font-family:'Bangers',cursive;letter-spacing:.05em;color:#f59e0b"></span>
+        </div>
+        <p style="text-align:center;font-family:'Merriweather',serif;color:#475569;font-size:.9rem;margin-bottom:14px">Trage (sau click) fiecare etichetă în categoria potrivită.</p>
+        <div class="gsort-bank" id="gSortBank">
+          <h4>📦 De sortat:</h4>
+          <div class="gsort-items" id="gSortItems"></div>
+        </div>
+        <div class="gsort-arena">
+          <div class="gsort-zone gv-zone" id="gZoneVirus" ondragover="gAllowDrop(event)" ondrop="gDropItem(event,'virus')">
+            <h4>🦠 Virus</h4>
+          </div>
+          <div class="gsort-zone gb-zone" id="gZoneBact" ondragover="gAllowDrop(event)" ondrop="gDropItem(event,'bact')">
+            <h4>🔵 Bacterie</h4>
+          </div>
+        </div>
+        <div class="gsort-actions">
+          <button class="gbtn-check" onclick="gCheckSort()">✓ Verifică</button>
+          <button class="gbtn-reset" onclick="gInitSort()">↩ Resetează</button>
+        </div>
+        <div class="gsort-fb" id="gSortFb"></div>
+      </div>
+
+      <!-- COMPLETARE -->
+      <div class="gscreen" id="gscreen-fill">
+        <div class="g-topbar">
+          <button class="g-back" onclick="gGoHome()">← Înapoi</button>
+          <span class="g-title">✍️ Completează</span>
+          <span id="gFillProg" style="font-family:'Bangers',cursive;letter-spacing:.05em;color:#f59e0b"></span>
+        </div>
+        <div id="gFillContent"></div>
+        <div class="gfill-actions">
+          <button class="gfill-submit" onclick="gCheckFill()">✓ Verifică</button>
+          <button class="gfill-skip" onclick="gNextFill()">Sari ▶</button>
+        </div>
+        <div class="gfill-fb" id="gFillFb"></div>
+      </div>
+
+      <!-- POTRIVIRE -->
+      <div class="gscreen" id="gscreen-match">
+        <div class="g-topbar">
+          <button class="g-back" onclick="gGoHome()">← Înapoi</button>
+          <span class="g-title">🔗 Potrivire</span>
+          <span id="gMatchScoreTop" style="font-family:'Bangers',cursive;letter-spacing:.05em;color:#f59e0b"></span>
+        </div>
+        <p style="text-align:center;font-family:'Merriweather',serif;color:#475569;font-size:.88rem;margin-bottom:14px">Click stânga → structură. Click dreapta → funcție. Potrivește-le!</p>
+        <div class="gmatch-grid">
+          <div><h5>🔬 STRUCTURĂ</h5><div id="gMatchLeft"></div></div>
+          <div><h5>📋 FUNCȚIE</h5><div id="gMatchRight"></div></div>
+        </div>
+        <div style="text-align:center;font-family:'Bangers',cursive;font-size:1.1rem;letter-spacing:.05em;margin-top:12px;color:#059669" id="gMatchScoreBot"></div>
+        <button onclick="gInitMatch()" style="display:block;margin:12px auto 0;border:3px solid #0f1f3d;border-radius:10px;padding:8px 20px;font-family:'Bangers',cursive;font-size:.95rem;letter-spacing:.04em;cursor:pointer;background:#fff;box-shadow:4px 4px 0 #0f1f3d">↩ Resetează</button>
+      </div>
+
+      <!-- QUIZ -->
+      <div class="gscreen" id="gscreen-quiz">
+        <div class="g-topbar">
+          <button class="g-back" onclick="gGoHome()">← Înapoi</button>
+          <span class="g-title">⚡ Quiz Rapid</span>
+          <span id="gQuizScoreTop" style="font-family:'Bangers',cursive;letter-spacing:.05em;color:#f59e0b"></span>
+        </div>
+        <div id="gQuizContent"></div>
+      </div>
+
+      <!-- REZULTAT -->
+      <div class="gscreen" id="gscreen-result">
+        <div class="g-topbar">
+          <button class="g-back" onclick="gGoHome()">← Acasă</button>
+          <span class="g-title">🏆 Rezultat</span>
+          <span></span>
+        </div>
+        <div class="gresult">
+          <div class="gr-emoji" id="grEmoji">🏆</div>
+          <h3 id="grTitle">Felicitări!</h3>
+          <div class="gr-score" id="grScore"></div>
+          <p id="grMsg"></p>
+          <div class="gresult-btns">
+            <button class="gbtn-again" id="grBtnAgain">↻ Din nou</button>
+            <button class="gbtn-home2" onclick="gGoHome()">🏠 Moduri</button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </div><!-- /mainApp -->
+</div><!-- /wrap -->
+
+<script>
+// ====== LANDING & NAVIGATION ======
+function enterApp(tab){
+  document.getElementById('landingPage').style.display='none';
+  const app=document.getElementById('mainApp');
+  app.style.display='block';
+  app.classList.remove('entering');
+  void app.offsetWidth; // reflow
+  app.classList.add('entering');
+  window.scrollTo(0,0);
+  if(tab){
+    const tabs=document.querySelectorAll('.tab');
+    tabs.forEach(t=>t.classList.remove('on'));
+    document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+    document.getElementById(tab).classList.add('on');
+    tabs.forEach(t=>{
+      if(t.getAttribute('onclick') && t.getAttribute('onclick').includes("'"+tab+"'")){
+        t.classList.add('on');
+      }
+    });
+    if(tab==='banda') renderScene(currentScene);
+  }
+  buildDynamicFigures();
+  selectVirus('capsida');
+  selectBacteria('nucleoid');
+  renderScene(0);
+}
+function goBack(){
+  document.getElementById('mainApp').style.display='none';
+  document.getElementById('landingPage').style.display='block';
+  window.scrollTo(0,0);
+}
+
+// Particles
+(function(){
+  const cont=document.getElementById('particles');
+  if(!cont) return;
+  const colors=['#7c3aed','#059669','#f59e0b','#3b82f6','#a78bfa'];
+  for(let i=0;i<22;i++){
+    const d=document.createElement('div');
+    d.className='p-dot';
+    const s=8+Math.random()*28;
+    d.style.cssText=`width:${s}px;height:${s}px;background:${colors[i%colors.length]};left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*5}s;animation-duration:${5+Math.random()*4}s`;
+    cont.appendChild(d);
+  }
+})();
+
+function showTab(id,btn){
+  // Ripple effect on button
+  const rect=btn.getBoundingClientRect();
+  const rip=document.createElement('span');
+  rip.className='ripple';
+  const size=Math.max(btn.offsetWidth,btn.offsetHeight)*2;
+  rip.style.cssText=`width:${size}px;height:${size}px;left:50%;top:50%;margin-left:-${size/2}px;margin-top:-${size/2}px;`;
+  btn.appendChild(rip);
+  rip.addEventListener('animationend',()=>rip.remove());
+
+  // Flash out current section then switch
+  const current=document.querySelector('.sec.on');
+  if(current){
+    current.style.transition='opacity .18s,transform .18s';
+    current.style.opacity='0';
+    current.style.transform='translateY(-10px) scale(.98)';
+    setTimeout(()=>{
+      current.style.transition='';current.style.opacity='';current.style.transform='';
+      current.classList.remove('on');
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+      const next=document.getElementById(id);
+      if(next){next.classList.add('on');}
+      btn.classList.add('on');
+      if(id==='banda') renderScene(currentScene);
+    },180);
+  } else {
+    document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+    document.getElementById(id).classList.add('on');
+    btn.classList.add('on');
+    if(id==='banda') renderScene(currentScene);
+  }
+}
+
+// ====== STRUCTURI ======
+const virusData={
+  materialGenetic:{t:'Material genetic',d:'Poate fi ADN sau ARN. Conține informația necesară pentru formarea noilor particule virale.'},
+  capsida:{t:'Capsidă',d:'Înveliș proteic ce protejează materialul genetic viral.'},
+  anvelopa:{t:'Anvelopă',d:'Înveliș lipidic extern, prezent la unele virusuri, cu rol în recunoașterea și infectarea celulei-gazdă.'},
+  spiculi:{t:'Spiculi',d:'Glicoproteine de suprafață cu rol în atașarea virusului de receptori specifici.'}
+};
+const bacteriaData={
+  capsula:{t:'Capsulă',d:'Strat extern protector care ajută la aderență și poate proteja bacteria.'},
+  perete:{t:'Perete celular',d:'Asigură formă și rezistență mecanică bacteriei.'},
+  membrana:{t:'Membrană celulară',d:'Controlează schimbul de substanțe dintre celulă și mediu.'},
+  citoplasma:{t:'Citoplasmă',d:'Mediul intern în care au loc numeroase reacții metabolice.'},
+  nucleoid:{t:'Nucleoid',d:'Regiunea în care se află ADN-ul bacterian.'},
+  ribozomi:{t:'Ribozomi',d:'Participă la sinteza proteinelor.'},
+  flagel:{t:'Flagel',d:'Apendice cu rol în deplasarea bacteriei.'},
+  pili:{t:'Pili',d:'Prelungiri scurte cu rol în aderență și uneori în transfer genetic.'}
+};
+function clearVirusState(){
+  document.querySelectorAll('#virusLegend button').forEach(b=>b.classList.remove('on'));
+  document.getElementById('virusEnvelope')&&document.getElementById('virusEnvelope').setAttribute('stroke','#1d4ed8');
+  document.getElementById('virusCapsid')&&document.getElementById('virusCapsid').setAttribute('stroke','#0f766e');
+  document.getElementById('virusGenetic')&&document.getElementById('virusGenetic').setAttribute('stroke','#9f1239');
+  document.querySelectorAll('.virusSpike').forEach(e=>e.setAttribute('fill','#f59e0b'));
+}
+function selectVirus(key){
+  clearVirusState();
+  const d=virusData[key];
+  const vi=document.getElementById('virusInfo');
+  if(vi) vi.innerHTML='<h4>'+d.t+'</h4><p>'+d.d+'</p>';
+  const btn=document.getElementById('virusBtn-'+key); if(btn) btn.classList.add('on');
+  if(key==='anvelopa'&&document.getElementById('virusEnvelope')) document.getElementById('virusEnvelope').setAttribute('stroke','#16a34a');
+  if(key==='capsida'&&document.getElementById('virusCapsid')) document.getElementById('virusCapsid').setAttribute('stroke','#16a34a');
+  if(key==='materialGenetic'&&document.getElementById('virusGenetic')) document.getElementById('virusGenetic').setAttribute('stroke','#16a34a');
+  if(key==='spiculi') document.querySelectorAll('.virusSpike').forEach(e=>e.setAttribute('fill','#16a34a'));
+}
+function clearBacteriaState(){
+  document.querySelectorAll('#bactLegend button').forEach(b=>b.classList.remove('on'));
+  document.getElementById('bactCapsule')&&document.getElementById('bactCapsule').setAttribute('stroke','#10b981');
+  document.getElementById('bactWall')&&document.getElementById('bactWall').setAttribute('stroke','#22c55e');
+  document.getElementById('bactMembrane')&&document.getElementById('bactMembrane').setAttribute('stroke','#65a30d');
+  document.getElementById('bactCytoplasm')&&document.getElementById('bactCytoplasm').setAttribute('fill','#fef9c3');
+  document.getElementById('bactNucleoid')&&document.getElementById('bactNucleoid').setAttribute('stroke','#be123c');
+  document.getElementById('bactFlagel')&&document.getElementById('bactFlagel').setAttribute('stroke','#2563eb');
+  document.querySelectorAll('.bactRibo').forEach(e=>e.setAttribute('fill','#7c3aed'));
+  document.querySelectorAll('.bactPil').forEach(e=>e.setAttribute('stroke','#0f172a'));
+}
+function selectBacteria(key){
+  clearBacteriaState();
+  const d=bacteriaData[key];
+  const bi=document.getElementById('bactInfo');
+  if(bi) bi.innerHTML='<h4>'+d.t+'</h4><p>'+d.d+'</p>';
+  const btn=document.getElementById('bactBtn-'+key); if(btn) btn.classList.add('on');
+  if(key==='capsula'&&document.getElementById('bactCapsule')) document.getElementById('bactCapsule').setAttribute('stroke','#16a34a');
+  if(key==='perete'&&document.getElementById('bactWall')) document.getElementById('bactWall').setAttribute('stroke','#16a34a');
+  if(key==='membrana'&&document.getElementById('bactMembrane')) document.getElementById('bactMembrane').setAttribute('stroke','#16a34a');
+  if(key==='citoplasma'&&document.getElementById('bactCytoplasm')) document.getElementById('bactCytoplasm').setAttribute('fill','#fde68a');
+  if(key==='nucleoid'&&document.getElementById('bactNucleoid')) document.getElementById('bactNucleoid').setAttribute('stroke','#16a34a');
+  if(key==='flagel'&&document.getElementById('bactFlagel')) document.getElementById('bactFlagel').setAttribute('stroke','#16a34a');
+  if(key==='ribozomi') document.querySelectorAll('.bactRibo').forEach(e=>e.setAttribute('fill','#16a34a'));
+  if(key==='pili') document.querySelectorAll('.bactPil').forEach(e=>e.setAttribute('stroke','#16a34a'));
+}
+
+// ====== COMIC ======
+function makeVirusChar(w=240,h=180){const cx=w/2,cy=h/2+12;let sp='';for(let i=0;i<12;i++){const a=i*Math.PI*2/12;const x1=cx+Math.cos(a)*34,y1=cy+Math.sin(a)*34;const x2=cx+Math.cos(a)*56,y2=cy+Math.sin(a)*56;sp+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#475569" stroke-width="4"/><circle cx="${x2}" cy="${y2}" r="8" fill="#f59e0b"/>`;}return `<svg viewBox="0 0 ${w} ${h}">${sp}<circle cx="${cx}" cy="${cy}" r="34" fill="#bfdcff" stroke="#1d4ed8" stroke-width="5"/><circle cx="${cx}" cy="${cy}" r="21" fill="#fda4af" stroke="#be123c" stroke-width="4"/><text x="${cx}" y="${cy+5}" font-size="15" text-anchor="middle" font-family="Bangers,cursive">VIRU</text></svg>`;}
+function makeBactChar(w=240,h=180){const cx=w/2,cy=h/2+12;return `<svg viewBox="0 0 ${w} ${h}"><ellipse cx="${cx}" cy="${cy}" rx="78" ry="54" fill="#d1fae5" stroke="#10b981" stroke-width="6"/><ellipse cx="${cx}" cy="${cy}" rx="54" ry="37" fill="#fef9c3" stroke="#ca8a04" stroke-width="3"/><ellipse cx="${cx}" cy="${cy}" rx="26" ry="18" fill="#fda4af" stroke="#be123c" stroke-width="4"/><path d="M${cx+78} ${cy} Q${cx+114} ${cy-18} ${cx+140} ${cy+24}" fill="none" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/><text x="${cx}" y="${cy+6}" font-size="16" text-anchor="middle" font-family="Bangers,cursive">BACTY</text></svg>`;}
+function makeMeet(w=240,h=180){return `<svg viewBox="0 0 ${w} ${h}"><circle cx="65" cy="106" r="30" fill="#bfdcff" stroke="#1d4ed8" stroke-width="4"/><circle cx="65" cy="106" r="18" fill="#fda4af" stroke="#be123c" stroke-width="3"/><text x="65" y="110" text-anchor="middle" font-size="11" font-family="Bangers,cursive">VIRU</text><ellipse cx="176" cy="106" rx="48" ry="34" fill="#d1fae5" stroke="#10b981" stroke-width="4"/><text x="176" y="110" text-anchor="middle" font-size="11" font-family="Bangers,cursive">BACTY</text><text x="120" y="100" font-size="28">✨</text></svg>`;}
+function makeCell(w=240,h=180){return `<svg viewBox="0 0 ${w} ${h}"><ellipse cx="160" cy="102" rx="68" ry="52" fill="#fef3c7" stroke="#d97706" stroke-width="5"/><text x="160" y="108" text-anchor="middle" font-size="14" font-family="Bangers,cursive" fill="#92400e">CELULĂ</text><circle cx="70" cy="84" r="28" fill="#bfdcff" stroke="#1d4ed8" stroke-width="4"/><text x="112" y="70" font-size="28">🎯</text></svg>`;}
+function makeDivision(w=240,h=180){return `<svg viewBox="0 0 ${w} ${h}"><ellipse cx="120" cy="96" rx="92" ry="50" fill="#d1fae5" stroke="#10b981" stroke-width="5"/><line x1="120" y1="48" x2="120" y2="144" stroke="#be123c" stroke-width="4" stroke-dasharray="6 4"/><ellipse cx="92" cy="96" rx="28" ry="21" fill="#bbf7d0" stroke="#22c55e" stroke-width="3"/><ellipse cx="148" cy="96" rx="28" ry="21" fill="#bbf7d0" stroke="#22c55e" stroke-width="3"/><text x="120" y="38" text-anchor="middle" font-size="28">✂️</text></svg>`;}
+function makeImmune(w=240,h=180){return `<svg viewBox="0 0 ${w} ${h}"><circle cx="122" cy="98" r="50" fill="#dbeafe" stroke="#2563eb" stroke-width="5"/><text x="122" y="104" text-anchor="middle" font-size="14" font-family="Bangers,cursive" fill="#1e3a8a">IMUN</text><circle cx="122" cy="98" r="68" fill="none" stroke="#3b82f6" stroke-width="2" stroke-dasharray="6 4" opacity=".5"/><text x="188" y="62" font-size="30">🚨</text></svg>`;}
+function makeHands(){return `<svg viewBox="0 0 240 180"><text x="120" y="92" text-anchor="middle" font-size="64">🙌</text><text x="62" y="136" font-size="22">🫧</text><text x="102" y="148" font-size="18">🫧</text><text x="158" y="136" font-size="22">🫧</text></svg>`;}
+function makeScience(){return `<svg viewBox="0 0 240 180"><text x="120" y="84" text-anchor="middle" font-size="50">🔬</text><text x="64" y="132" font-size="30">🦠</text><text x="160" y="132" font-size="28">🔵</text><text x="120" y="162" text-anchor="middle" font-size="15" font-family="Bangers,cursive" fill="#059669">ȘTIINȚA NE PROTEJEAZĂ!</text></svg>`;}
+
+let currentScene=0;
+const scenes=[
+  {panels:[{bg:'bg-city',bubbles:[{type:'speech',text:'Eu sunt VIRU! Mic, dar periculos! 💀'}],art:makeVirusChar(),cap:'Undeva în aerul orașului…'},{bg:'bg-city',bubbles:[{type:'speech',text:'Eu sunt BACTY! Mă hrănesc singur! 💪'}],art:makeBactChar(),cap:'…și în sol, sub o floare…'},{bg:'bg-bright',bubbles:[{type:'speech',text:'Hei! Tu ești o celulă?'},{type:'speech',text:'Nu! Sunt bacterie!'}],art:makeMeet(),cap:'Cele două microorganisme se întâlnesc!'}]},
+  {panels:[{bg:'bg-lab',bubbles:[{type:'thought',text:'Cum intru în celulă? 🤔'}],art:makeVirusChar(),cap:'Viru are nevoie de o gazdă.'},{bg:'bg-body',bubbles:[{type:'shout',text:'RECEPTOR GĂSIT! 🎯'}],art:makeCell(),cap:'Viru găsește o celulă potrivită.'},{bg:'bg-dark',bubbles:[{type:'speech',text:'Facem copii noi! ⚡'}],art:makeCell(),cap:'Materialul genetic este injectat.'}]},
+  {panels:[{bg:'bg-bright',bubbles:[{type:'speech',text:'Mă hrănesc… cresc… 🌱'}],art:makeBactChar(),cap:'Bacty se hrănește și crește.'},{bg:'bg-lab',bubbles:[{type:'shout',text:'DIVIZIUNE! ✂️'}],art:makeDivision(),cap:'Fisiunea binară începe.'},{bg:'bg-bright',bubbles:[{type:'speech',text:'Salut, clonă!'},{type:'speech',text:'Salut, original!'}],art:makeMeet(),cap:'Dintr-una apar două bacterii.'}]},
+  {panels:[{bg:'bg-body',bubbles:[{type:'shout',text:'ALARMĂ! 🚨'}],art:makeImmune(),cap:'Sistemul imunitar detectează intruși.'},{bg:'bg-dark',bubbles:[{type:'speech',text:'Nu treci! 🛡️'},{type:'speech',text:'Nooo! 😱'}],art:makeVirusChar(),cap:'Anticorpii luptă cu virusul.'},{bg:'bg-hosp',bubbles:[{type:'speech',text:'Antibioticul mă poate opri!'}],art:makeBactChar(),cap:'Antibioticele acționează asupra bacteriilor.'}]},
+  {panels:[{bg:'bg-bright',bubbles:[{type:'speech',text:'Unele bacterii sunt utile! 🧀🌱'}],art:makeBactChar(),cap:'Există bacterii benefice.'},{bg:'bg-lab',bubbles:[{type:'speech',text:'Există virusuri care atacă bacterii!'}],art:makeVirusChar(),cap:'Bacteriofagii infectează bacterii.'},{bg:'bg-city',bubbles:[{type:'speech',text:'Vaccinul antrenează imunitatea! 💉'}],art:makeImmune(),cap:'Vaccinarea protejează.'}]},
+  {panels:[{bg:'bg-hosp',bubbles:[{type:'speech',text:'Spălatul pe mâini ajută mult!'}],art:makeHands(),cap:'Igiena este prima linie de apărare.'},{bg:'bg-bright',bubbles:[{type:'speech',text:'Eu depind de gazdă…'},{type:'speech',text:'Eu pot fi util sau dăunător!'}],art:makeMeet(),cap:'Concluzie: sunt entități diferite.'},{bg:'bg-city',bubbles:[{type:'shout',text:'SFÂRȘIT! Ai recapitulat noțiunile.'}],art:makeScience(),cap:'Lumea invizibilă ne înconjoară permanent.'}]}
+];
+function bubbleClass(type){return type==='thought'?'thought':type==='shout'?'shout':'speech';}
+function renderScene(idx){
+  const scene=scenes[idx];
+  let html='<div class="comic-strip">';
+  scene.panels.forEach((p,i)=>{
+    html+=`<article class="comic-panel">
+      <div class="${p.bg}" style="position:relative;flex:1;display:flex;flex-direction:column;">
+        <div class="scene-number">${idx*3+i+1}</div>
+        <div class="scene-top"><div class="bubbleRow">`;
+    p.bubbles.forEach(b=>html+=`<div class="${bubbleClass(b.type)}">${b.text}</div>`);
+    html+=`</div></div>
+        <div class="scene-art" style="flex:1;">${p.art}</div>
+      </div>
+      <div class="scene-cap">${p.cap}</div>
+    </article>`;
+  });
+  html+='</div>';
+  document.getElementById('comicBox').innerHTML=html;
+  document.getElementById('sceneLabel').textContent=`Scena ${idx+1} din ${scenes.length}`;
+  document.getElementById('sceneFill').style.width=`${((idx+1)/scenes.length)*100}%`;
+  document.getElementById('prevBtn').disabled=idx===0;
+  document.getElementById('nextBtn').disabled=idx===scenes.length-1;
+  document.getElementById('nextBtn').textContent=idx===scenes.length-1?'✅ Final':'Înainte ▶';
+}
+function nextScene(){if(currentScene<scenes.length-1){currentScene++;renderScene(currentScene);}}
+function prevScene(){if(currentScene>0){currentScene--;renderScene(currentScene);}}
+function restartComic(){currentScene=0;renderScene(0);}
+
+// ====== QUIZ CU POSIBILITATE DE SCHIMBARE ======
+const quizData=[
+  {type:'mcq',q:'Virusurile sunt:',answers:['organisme unicelulare procariote','entități acelulare','celule eucariote'],correct:1,feedbackOk:'Corect! Virusurile sunt entități acelulare și depind de celula-gazdă.',feedbackBad:'Răspuns corect: entități acelulare. Virusurile nu sunt celule adevărate.'},
+  {type:'mcq',q:'Bacteriile se reproduc, în mod obișnuit, prin:',answers:['fisiune binară','meioză','încolțire virală'],correct:0,feedbackOk:'Corect! Bacteriile se divid prin fisiune binară.',feedbackBad:'Răspuns corect: fisiune binară.'},
+  {type:'mcq',q:'Care structură protejează materialul genetic al virusului?',answers:['capsida','flagelul','capsula bacteriană'],correct:0,feedbackOk:'Corect! Capsida este învelișul proteic al virusului.',feedbackBad:'Răspuns corect: capsida.'},
+  {type:'mcq',q:'Antibioticele acționează în mod direct asupra:',answers:['virusurilor','bacteriilor sensibile','ambelor în mod egal'],correct:1,feedbackOk:'Corect! Antibioticele sunt utile împotriva bacteriilor sensibile.',feedbackBad:'Răspuns corect: bacteriilor sensibile.'},
+  {type:'mcq',q:'Ce structură bacteriană are rol important în deplasare?',answers:['flagelul','capsida','anvelopa'],correct:0,feedbackOk:'Corect! Flagelul ajută bacteria să se deplaseze.',feedbackBad:'Răspuns corect: flagelul.'},
+  {type:'hotspot-virus',q:'Privește figura virusului și apasă pe capsidă.',target:'capsida',feedbackOk:'Foarte bine! Capsida este învelișul proteic aflat în jurul materialului genetic.',feedbackBad:'Răspuns corect: capsida — învelișul proteic din jurul materialului genetic.'},
+  {type:'hotspot-bacteria',q:'Privește figura bacteriei și apasă pe nucleoid.',target:'nucleoid',feedbackOk:'Corect! Nucleoidul conține ADN-ul bacterian.',feedbackBad:'Răspuns corect: nucleoidul, regiunea cu ADN bacterian.'},
+  {type:'hotspot-bacteria',q:'Privește figura bacteriei și apasă pe membrana celulară.',target:'membrana',feedbackOk:'Corect! Membrana celulară controlează schimbul de substanțe.',feedbackBad:'Răspuns corect: membrana celulară.'},
+  {type:'hotspot-virus',q:'Privește figura virusului și apasă pe spiculi.',target:'spiculi',feedbackOk:'Corect! Spiculii ajută la recunoașterea și fixarea pe celula-gazdă.',feedbackBad:'Răspuns corect: spiculii de la suprafața virusului.'},
+  {type:'mcq',q:'La finalul lecției, alegerea corectă este:',answers:['bacteriile sunt întotdeauna dăunătoare','virusurile au ribozomi proprii','bacteriile pot fi utile sau dăunătoare'],correct:2,feedbackOk:'Corect! Există bacterii utile și bacterii patogene.',feedbackBad:'Răspuns corect: bacteriile pot fi utile sau dăunătoare.'}
+];
+
+let quizIndex=0,quizScore=0,quizResults=[],quizLocked=false;
+let selectedAnswer=-1;    // MCQ: indexul selectat
+let selectedHotspot=null; // Hotspot: elementul selectat
+
+function startQuiz(){
+  quizIndex=0;quizScore=0;quizResults=[];quizLocked=false;
+  selectedAnswer=-1;selectedHotspot=null;
+  renderQuestion();
+}
+
+function renderQuestion(){
+  selectedAnswer=-1;selectedHotspot=null;quizLocked=false;
+  const q=quizData[quizIndex];
+  const pct=Math.round(((quizIndex)/quizData.length)*100);
+  let html=`
+    <div style="margin-bottom:16px">
+      <div class="quizTop">
+        <div class="quizMeta">Întrebarea ${quizIndex+1} din ${quizData.length}</div>
+        <div class="quizMeta" style="color:#059669">Scor: ${quizScore} / ${quizIndex}</div>
+      </div>
+      <div class="bar"><div class="fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="qwrap">
+      <h3>${quizIndex+1}. ${q.q}</h3>`;
+
+  if(q.type==='mcq'){
+    html+=`<div class="answers" id="answersDiv">`;
+    q.answers.forEach((a,i)=>{
+      html+=`<button class="answerBtn" id="ansBtn-${i}" onclick="selectMcq(${i})">${a}</button>`;
+    });
+    html+=`</div>
+    <div class="confirm-bar hidden" id="confirmBar">
+      <span class="hint">✅ Ai ales: <strong id="chosenLabel"></strong></span>
+      <div style="display:flex;gap:8px">
+        <button class="change-btn" onclick="changeMcq()">↩ Schimbă răspunsul</button>
+        <button class="confirm-btn" onclick="confirmMcq()">Confirmă ▶</button>
+      </div>
+    </div>`;
+  } else if(q.type==='hotspot-virus'){
+    html+=hotspotVirusFigure();
+  } else if(q.type==='hotspot-bacteria'){
+    html+=hotspotBacteriaFigure();
+  }
+
+  html+=`<div id="feedback" class="feedback"></div>`;
+  html+=`<button id="nextQuestionBtn" class="nextBtn" onclick="goNextQuestion()">${quizIndex===quizData.length-1?'🏆 Vezi rezultatul':'Întrebarea următoare ▶'}</button>`;
+  html+=`</div>`;
+  document.getElementById('quizApp').innerHTML=html;
+
+  if(q.type!=='mcq') setupHotspotListeners();
+}
+
+// MCQ: selectare (fără confirmare imediată)
+function selectMcq(index){
+  if(quizLocked) return;
+  selectedAnswer=index;
+  document.querySelectorAll('.answerBtn').forEach((btn,i)=>{
+    btn.classList.remove('selected');
+    if(i===index) btn.classList.add('selected');
+  });
+  const bar=document.getElementById('confirmBar');
+  bar.classList.remove('hidden');
+  const q=quizData[quizIndex];
+  document.getElementById('chosenLabel').textContent=q.answers[index];
+}
+
+// MCQ: schimbă răspunsul (deselectează totul)
+function changeMcq(){
+  selectedAnswer=-1;
+  document.querySelectorAll('.answerBtn').forEach(btn=>btn.classList.remove('selected'));
+  document.getElementById('confirmBar').classList.add('hidden');
+}
+
+// MCQ: confirmare și evaluare
+function confirmMcq(){
+  if(selectedAnswer===-1||quizLocked) return;
+  quizLocked=true;
+  const q=quizData[quizIndex];
+  const good=selectedAnswer===q.correct;
+  document.querySelectorAll('.answerBtn').forEach((btn,i)=>{
+    btn.disabled=true;btn.classList.add('locked');
+    btn.classList.remove('selected');
+    if(i===q.correct) btn.classList.add('correct');
+    if(i===selectedAnswer&&i!==q.correct) btn.classList.add('wrong');
+  });
+  document.getElementById('confirmBar').classList.add('hidden');
+  finalizeQuestion(good,q,q.answers[selectedAnswer],q.answers[q.correct]);
+}
+
+function finalizeQuestion(good,q,chosen,correctText){
+  if(good) quizScore++;
+  quizResults.push({nr:quizIndex+1,item:q.q,chosen:chosen||'(hotspot)',correct:correctText||q.target,status:good?'✅ Corect':'❌ Greșit'});
+  const fb=document.getElementById('feedback');
+  fb.className='feedback '+(good?'ok':'bad');
+  fb.textContent=good?q.feedbackOk:q.feedbackBad;
+  const nxt=document.getElementById('nextQuestionBtn');
+  nxt.style.display='inline-block';
+}
+
+function goNextQuestion(){
+  quizIndex++;
+  if(quizIndex>=quizData.length) renderQuizResult();
+  else renderQuestion();
+}
+
+// HOTSPOT FIGURES
+function hotspotVirusFigure(){
+  return `<div class="questionFigure">
+    <div class="hotspotHint">Apasă pe elementul corect în figură. Poți schimba selecția înainte de confirmare.</div>
+    <div class="hotspotWrap">
+      <svg viewBox="0 0 420 320" style="max-width:340px">
+        <g id="qVirusSpikes"></g>
+        <circle id="spotVirusEnvelope" class="hotspot" data-part="anvelopa" cx="210" cy="160" r="92" fill="#bfdcff" stroke="#1d4ed8" stroke-width="8"></circle>
+        <circle id="spotVirusCapsid" class="hotspot" data-part="capsida" cx="210" cy="160" r="66" fill="#e0f2fe" stroke="#0f766e" stroke-width="7"></circle>
+        <path id="spotVirusGenetic" class="hotspot" data-part="materialGenetic" d="M176 156 C194 116,240 116,255 156 C238 202,193 202,176 156 Z" fill="#fda4af" stroke="#be123c" stroke-width="6"></path>
+      </svg>
+    </div>
+    <div class="hs-confirm-bar hidden" id="hsConfirmBar">
+      <span style="font-weight:700;color:#1e40af;font-size:.95rem">Ai selectat: <strong id="hsChosenLabel"></strong></span>
+      <div style="display:flex;gap:8px">
+        <button class="change-btn" onclick="changeHotspot()">↩ Schimbă</button>
+        <button class="confirm-btn" onclick="confirmHotspot()">Confirmă ▶</button>
+      </div>
+    </div>
+  </div>`;
+}
+function hotspotBacteriaFigure(){
+  return `<div class="questionFigure">
+    <div class="hotspotHint">Apasă pe elementul corect în figură. Poți schimba selecția înainte de confirmare.</div>
+    <div class="hotspotWrap">
+      <svg viewBox="0 0 500 330" style="max-width:380px">
+        <ellipse id="spotBactCapsule" class="hotspot" data-part="capsula" cx="210" cy="160" rx="126" ry="78" fill="#d1fae5" stroke="#10b981" stroke-width="8"></ellipse>
+        <ellipse id="spotBactWall" class="hotspot" data-part="perete" cx="210" cy="160" rx="110" ry="64" fill="#bbf7d0" stroke="#22c55e" stroke-width="8"></ellipse>
+        <ellipse id="spotBactMembrane" class="hotspot" data-part="membrana" cx="210" cy="160" rx="96" ry="52" fill="#ecfccb" stroke="#65a30d" stroke-width="6"></ellipse>
+        <ellipse cx="210" cy="160" rx="86" ry="42" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"></ellipse>
+        <path id="spotBactNucleoid" class="hotspot" data-part="nucleoid" d="M170 160 C188 128,240 128,257 160 C238 198,188 198,170 160 Z" fill="#fda4af" stroke="#be123c" stroke-width="6"></path>
+        <g id="spotBactRibos"></g>
+        <g id="spotBactPili"></g>
+        <path id="spotBactFlagel" class="hotspot" data-part="flagel" d="M334 174 C388 198,423 232,414 272 C407 300,444 316,476 301" fill="none" stroke="#2563eb" stroke-width="8" stroke-linecap="round"></path>
+      </svg>
+    </div>
+    <div class="hs-confirm-bar hidden" id="hsConfirmBar">
+      <span style="font-weight:700;color:#1e40af;font-size:.95rem">Ai selectat: <strong id="hsChosenLabel"></strong></span>
+      <div style="display:flex;gap:8px">
+        <button class="change-btn" onclick="changeHotspot()">↩ Schimbă</button>
+        <button class="confirm-btn" onclick="confirmHotspot()">Confirmă ▶</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function setupHotspotListeners(){
+  setTimeout(()=>{
+    buildQuestionFigures();
+    document.querySelectorAll('.hotspot').forEach(el=>{
+      el.addEventListener('click',function(){
+        if(quizLocked) return;
+        // Deselect previous
+        document.querySelectorAll('.hotspot').forEach(h=>{
+          h.classList.remove('hs-selected');
+          h.style.stroke='';
+        });
+        // Select this
+        this.classList.add('hs-selected');
+        selectedHotspot=this;
+        // Show confirm bar
+        const bar=document.getElementById('hsConfirmBar');
+        if(bar){
+          bar.classList.remove('hidden');
+          const lbl=document.getElementById('hsChosenLabel');
+          const names={anvelopa:'Anvelopă',capsida:'Capsidă',materialGenetic:'Material genetic',spiculi:'Spiculi',capsula:'Capsulă',perete:'Perete celular',membrana:'Membrană celulară',citoplasma:'Citoplasmă',nucleoid:'Nucleoid',ribozomi:'Ribozomi',flagel:'Flagel',pili:'Pili'};
+          if(lbl) lbl.textContent=names[this.dataset.part]||this.dataset.part;
+        }
+      });
+    });
+  },50);
+}
+
+function changeHotspot(){
+  if(selectedHotspot){
+    selectedHotspot.classList.remove('hs-selected');
+    selectedHotspot=null;
+  }
+  document.querySelectorAll('.hotspot').forEach(h=>h.classList.remove('hs-selected'));
+  const bar=document.getElementById('hsConfirmBar');
+  if(bar) bar.classList.add('hidden');
+}
+
+function confirmHotspot(){
+  if(!selectedHotspot||quizLocked) return;
+  quizLocked=true;
+  const q=quizData[quizIndex];
+  const part=selectedHotspot.dataset.part;
+  const good=part===q.target;
+  document.querySelectorAll('.hotspot').forEach(h=>{
+    h.style.pointerEvents='none';
+    h.classList.remove('hs-selected');
+    if(h.dataset.part===q.target) h.classList.add('correctSpot');
+  });
+  if(!good) selectedHotspot.classList.add('wrongSpot');
+  const bar=document.getElementById('hsConfirmBar');
+  if(bar) bar.classList.add('hidden');
+  const names={anvelopa:'Anvelopă',capsida:'Capsidă',materialGenetic:'Material genetic',spiculi:'Spiculi',capsula:'Capsulă',perete:'Perete celular',membrana:'Membrană celulară',citoplasma:'Citoplasmă',nucleoid:'Nucleoid',ribozomi:'Ribozomi',flagel:'Flagel',pili:'Pili'};
+  finalizeQuestion(good,q,names[part]||part,names[q.target]||q.target);
+}
+
+function renderQuizResult(){
+  const pct=Math.round((quizScore/quizData.length)*100);
+  let label='Mai exersează',cls='practice',msg='Ai nevoie de recapitulare pentru a fixa mai bine noțiunile.';
+  if(pct>=90){label='Excelent 🏆';cls='excellent';msg='Stăpânești foarte bine noțiunile despre virusuri și bacterii!';}
+  else if(pct>=60){label='Bine 👍';cls='good';msg='Ai o bază bună, dar mai merită exersate câteva concepte.';}
+  const rows=quizResults.map(r=>`<tr><td>${r.nr}</td><td style="max-width:200px">${r.item}</td><td>${r.chosen}</td><td>${r.correct}</td><td><strong>${r.status}</strong></td></tr>`).join('');
+  document.getElementById('quizApp').innerHTML=`
+    <div class="resultWrap">
+      <div class="badgeBox">
+        <h3>🏆 Rezultatul tău</h3>
+        <div class="resultScore">Scor final: ${quizScore} / ${quizData.length} (${pct}%)</div>
+        <div class="badgePill ${cls}">${label}</div>
+        <p style="margin-top:14px;font-family:'Merriweather',serif;line-height:1.7">${msg}</p>
+        <div class="startArea" style="margin-top:16px"><button class="startBtn" onclick="startQuiz()">↻ Reia testul</button></div>
+      </div>
+      <div class="reportBox">
+        <h3>📊 Raport detaliat</h3>
+        <p class="small" style="margin-bottom:10px">Răspunsul ales, varianta corectă și statusul fiecărei întrebări.</p>
+        <table class="reportTable">
+          <thead><tr><th>#</th><th>Întrebare</th><th>Răspuns ales</th><th>Răspuns corect</th><th>Status</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+// ====== BUILD DYNAMIC FIGURES ======
+function buildDynamicFigures(){
+  const sg=document.getElementById('virusSpikes');
+  if(sg&&!sg.dataset.ready){
+    for(let i=0;i<16;i++){
+      const a=i*Math.PI*2/16;
+      const x1=320+Math.cos(a)*120,y1=210+Math.sin(a)*120;
+      const x2=320+Math.cos(a)*156,y2=210+Math.sin(a)*156;
+      const ln=document.createElementNS('http://www.w3.org/2000/svg','line');
+      ln.setAttribute('x1',x1);ln.setAttribute('y1',y1);ln.setAttribute('x2',x2);ln.setAttribute('y2',y2);ln.setAttribute('stroke','#475569');ln.setAttribute('stroke-width','4');
+      const ci=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      ci.setAttribute('cx',x2);ci.setAttribute('cy',y2);ci.setAttribute('r','10');ci.setAttribute('fill','#f59e0b');ci.setAttribute('class','clickable virusSpike');
+      ci.addEventListener('click',()=>selectVirus('spiculi'));
+      sg.appendChild(ln);sg.appendChild(ci);
+    }
+    sg.dataset.ready='1';
+  }
+  const rg=document.getElementById('bactRibosomes');
+  if(rg&&!rg.dataset.ready){
+    [[220,190],[250,248],[280,180],[330,245],[364,203],[294,223],[385,233],[188,222]].forEach(pt=>{
+      const ci=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      ci.setAttribute('cx',pt[0]);ci.setAttribute('cy',pt[1]);ci.setAttribute('r','5');ci.setAttribute('fill','#7c3aed');ci.setAttribute('class','clickable bactRibo');
+      ci.addEventListener('click',()=>selectBacteria('ribozomi'));rg.appendChild(ci);
+    });
+    rg.dataset.ready='1';
+  }
+  const pg=document.getElementById('bactPili');
+  if(pg&&!pg.dataset.ready){
+    [[130,172,98,146],[126,220,90,220],[132,272,92,298],[160,300,128,326]].forEach(p=>{
+      const li=document.createElementNS('http://www.w3.org/2000/svg','line');
+      li.setAttribute('x1',p[0]);li.setAttribute('y1',p[1]);li.setAttribute('x2',p[2]);li.setAttribute('y2',p[3]);li.setAttribute('stroke','#0f172a');li.setAttribute('stroke-width','3');li.setAttribute('stroke-linecap','round');li.setAttribute('class','clickable bactPil');
+      li.addEventListener('click',()=>selectBacteria('pili'));pg.appendChild(li);
+    });
+    pg.dataset.ready='1';
+  }
+}
+function buildQuestionFigures(){
+  const qVirus=document.getElementById('qVirusSpikes');
+  if(qVirus&&!qVirus.dataset.ready){
+    for(let i=0;i<14;i++){
+      const a=i*Math.PI*2/14;
+      const x1=210+Math.cos(a)*92,y1=160+Math.sin(a)*92;
+      const x2=210+Math.cos(a)*124,y2=160+Math.sin(a)*124;
+      const ln=document.createElementNS('http://www.w3.org/2000/svg','line');
+      ln.setAttribute('x1',x1);ln.setAttribute('y1',y1);ln.setAttribute('x2',x2);ln.setAttribute('y2',y2);ln.setAttribute('stroke','#475569');ln.setAttribute('stroke-width','4');
+      const ci=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      ci.setAttribute('cx',x2);ci.setAttribute('cy',y2);ci.setAttribute('r','8');ci.setAttribute('fill','#f59e0b');ci.setAttribute('class','hotspot');ci.dataset.part='spiculi';
+      qVirus.appendChild(ln);qVirus.appendChild(ci);
+    }
+    qVirus.dataset.ready='1';
+  }
+  const spotR=document.getElementById('spotBactRibos');
+  if(spotR&&!spotR.dataset.ready){
+    [[172,145],[200,190],[230,142],[260,188],[286,154],[212,166],[288,176]].forEach(pt=>{
+      const ci=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      ci.setAttribute('cx',pt[0]);ci.setAttribute('cy',pt[1]);ci.setAttribute('r','5');ci.setAttribute('fill','#7c3aed');ci.setAttribute('class','hotspot');ci.dataset.part='ribozomi';
+      spotR.appendChild(ci);
+    });
+    spotR.dataset.ready='1';
+  }
+  const spotP=document.getElementById('spotBactPili');
+  if(spotP&&!spotP.dataset.ready){
+    [[84,130,58,108],[84,162,48,162],[88,198,52,220],[108,228,76,252]].forEach(p=>{
+      const li=document.createElementNS('http://www.w3.org/2000/svg','line');
+      li.setAttribute('x1',p[0]);li.setAttribute('y1',p[1]);li.setAttribute('x2',p[2]);li.setAttribute('y2',p[3]);li.setAttribute('stroke','#0f172a');li.setAttribute('stroke-width','3');li.setAttribute('stroke-linecap','round');li.setAttribute('class','hotspot');li.dataset.part='pili';
+      spotP.appendChild(li);
+    });
+    spotP.dataset.ready='1';
+  }
+}
+
+const obs=new MutationObserver(()=>buildQuestionFigures());
+document.addEventListener('DOMContentLoaded',()=>{
+  const qa=document.getElementById('quizApp');
+  if(qa) obs.observe(qa,{childList:true,subtree:true});
+  setSimulatorColor('#FF4444');
+});
+
+// ====== CURSOR GLOW ======
+(function(){
+  const glow=document.getElementById('cursorGlow');
+  const dot=document.getElementById('cursorDot');
+  let mx=0,my=0,gx=0,gy=0;
+  document.addEventListener('mousemove',e=>{
+    mx=e.clientX;my=e.clientY;
+    dot.style.left=mx+'px';dot.style.top=my+'px';
+    glow.style.left=mx+'px';glow.style.top=my+'px';
+    // Change dot color near interactive elements
+    const el=document.elementFromPoint(mx,my);
+    if(el&&(el.tagName==='BUTTON'||el.tagName==='A'||el.closest('.feat-card')||el.closest('.tab'))){
+      dot.style.transform='translate(-50%,-50%) scale(1.8)';
+      dot.style.background='var(--gold)';
+      dot.style.boxShadow='0 0 18px 6px rgba(245,158,11,.7)';
+    } else {
+      dot.style.transform='translate(-50%,-50%) scale(1)';
+      dot.style.background='var(--v)';
+      dot.style.boxShadow='0 0 12px 4px rgba(124,58,237,.6)';
+    }
+  });
+})();
+
+// ====== SCROLL REVEAL ======
+(function(){
+  const targets=document.querySelectorAll('.card,.feat-card,.authors-strip,.ctable,.panel,.comic-panel');
+  targets.forEach(el=>el.classList.add('reveal'));
+  const io=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}});
+  },{threshold:.1});
+  targets.forEach(el=>io.observe(el));
+})();
+
+function setSimulatorColor(hexColor){
+  const color=hexToRgb(hexColor);
+  const cp=document.getElementById('colorPicker');
+  if(cp) cp.value=hexColor;
+  const sc=document.getElementById('sensorColor');
+  if(sc) sc.style.background=hexColor;
+  const sensorValue=calculateSensorReading(color);
+  const intensity=Math.round((sensorValue/255)*100);
+  const rgb=document.getElementById('sensorRGB');
+  if(rgb) rgb.textContent=`RGB: (${color.r}, ${color.g}, ${color.b})`;
+  const si=document.getElementById('sensorIntensity');
+  if(si) si.textContent=`Intensitate: ${intensity}%`;
+  classifyDetection(sensorValue,color);
+}
+function hexToRgb(hex){const result=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);return result?{r:parseInt(result[1],16),g:parseInt(result[2],16),b:parseInt(result[3],16)}:{r:255,g:68,b:68};}
+function calculateSensorReading(rgb){return Math.min(255,Math.round(rgb.g*0.7+rgb.r*0.3+rgb.b*0.2));}
+function classifyDetection(sensorValue,rgb){
+  let vs=0,bs=0,us=0;
+  if(sensorValue>200){bs=95;vs=5;}
+  else if(sensorValue>150){bs=80;vs=10;us=10;}
+  else if(sensorValue>100){bs=50;vs=35;us=15;}
+  else if(sensorValue>60){vs=85;bs=10;us=5;}
+  else{vs=98;bs=2;}
+  const vEl=document.getElementById('virusScore');
+  const bEl=document.getElementById('bacteriaScore');
+  const uEl=document.getElementById('uncertainScore');
+  if(vEl) vEl.textContent=vs+'%';
+  if(bEl) bEl.textContent=bs+'%';
+  if(uEl) uEl.textContent=us+'%';
+  const resultDivs=document.querySelectorAll('#detectionResult > div');
+  if(resultDivs.length>=3){resultDivs[0].style.opacity=vs>50?'1':'0.5';resultDivs[1].style.opacity=us>50?'1':'0.5';resultDivs[2].style.opacity=bs>50?'1':'0.5';}
+  const expl=document.getElementById('explanation');
+  if(!expl) return;
+  if(vs>70) expl.innerHTML=`<strong style="color:#dc2626">✓ VIRUS DETECTAT!</strong> Senzorul a citit o valoare mică (${sensorValue}), indicând absența luminii verzi — colorant roșu tipic pentru virusuri.`;
+  else if(bs>70) expl.innerHTML=`<strong style="color:#16a34a">✓ BACTERIE DETECTATĂ!</strong> Senzorul a citit o valoare mare (${sensorValue}), indicând prezența luminii verzi — colorant verde tipic pentru bacterii.`;
+  else expl.innerHTML=`<strong style="color:#f59e0b">⚠ REZULTAT INCERT</strong> Senzorul a citit o valoare intermediară (${sensorValue}). Verifică calibrarea senzorului.`;
+}
+</script>
+
+<script>
+// ============================================================
+//  JOC INTERACTIV — integrat în tab-ul "Test"
+// ============================================================
+
+// ----- helpers -----
+function gShowScreen(id){
+  document.querySelectorAll('.gscreen').forEach(s=>{s.classList.remove('gactive');});
+  document.getElementById(id).classList.add('gactive');
+}
+function gGoHome(){gShowScreen('gscreen-home');}
+function gSpawnStars(n){
+  for(let i=0;i<(n||5);i++){
+    const s=document.createElement('div');s.className='gstar';
+    s.textContent=['⭐','✨','🌟','💫'][Math.floor(Math.random()*4)];
+    s.style.left=Math.random()*88+6+'vw';s.style.top=Math.random()*55+15+'vh';
+    s.style.animationDelay=Math.random()*.4+'s';
+    document.body.appendChild(s);setTimeout(()=>s.remove(),1500);
+  }
+}
+function gShowReward(emoji,title,msg){
+  const ov=document.getElementById('gameRewardOverlay');
+  document.getElementById('gRewardEmoji').textContent=emoji;
+  document.getElementById('gRewardTitle').textContent=title;
+  document.getElementById('gRewardMsg').textContent=msg;
+  ov.style.display='flex';gSpawnStars(10);
+}
+function gCloseReward(){document.getElementById('gameRewardOverlay').style.display='none';}
+let gCurrentMode='';
+function gStartMode(m){gCurrentMode=m;gModeInits[m]();}
+
+// ----- FLASHCARD DATA -----
+const gFlashcards=[
+  {emoji:'🦠',q:'Ce sunt virusurile?',a:'Entități acelulare, fără metabolism propriu, alcătuite din material genetic și un înveliș proteic. Se multiplică NUMAI în celula-gazdă.',tag:'NOȚIUNI DE BAZĂ'},
+  {emoji:'🔵',q:'Ce sunt bacteriile?',a:'Organisme unicelulare PROCARIOTE cu membrană, citoplasmă, ribozomi și ADN propriu. Se reproduc independent prin fisiune binară.',tag:'NOȚIUNI DE BAZĂ'},
+  {emoji:'⚖️',q:'Care este diferența esențială virus vs. bacterie?',a:'Virusul este acelular și depinde de gazdă. Bacteria este o celulă vie cu metabolism și reproducere proprie.',tag:'COMPARAȚIE'},
+  {emoji:'💊',q:'De ce antibioticele nu funcționează împotriva virusurilor?',a:'Antibioticele atacă structuri bacteriene (perete celular, ribozomi). Virusurile nu au aceste structuri.',tag:'MEDICAL'},
+  {emoji:'🧬',q:'Ce este capsida?',a:'Învelișul PROTEIC al virusului care protejează materialul genetic. Poate fi sferică, helicoidală sau complexă.',tag:'STRUCTURA VIRUSULUI'},
+  {emoji:'🌊',q:'Ce este anvelopa virală?',a:'Înveliș LIPIDIC extern, prezent la unele virusuri. Ajută la recunoașterea și infectarea celulei-gazdă.',tag:'STRUCTURA VIRUSULUI'},
+  {emoji:'🔱',q:'Ce sunt spiculii virali?',a:'Glicoproteine de suprafață cu rol în ATAȘAREA pe receptori specifici ai celulei-gazdă.',tag:'STRUCTURA VIRUSULUI'},
+  {emoji:'🏰',q:'Ce rol are peretele celular la bacterii?',a:'Asigură FORMA și rezistența mecanică a bacteriei.',tag:'STRUCTURA BACTERIEI'},
+  {emoji:'🏃',q:'Ce este flagelul bacterian?',a:'Apendice filamentos cu rol în DEPLASAREA bacteriei. Funcționează ca un motor rotativ molecular.',tag:'STRUCTURA BACTERIEI'},
+  {emoji:'🤝',q:'Ce sunt pilii bacterieni?',a:'Prelungiri scurte cu rol în ADERENȚĂ la suprafețe și transfer de material genetic între bacterii.',tag:'STRUCTURA BACTERIEI'},
+  {emoji:'🧠',q:'Ce este nucleoidul bacterian?',a:'Regiunea din citoplasmă în care se află ADN-ul bacterian CIRCULAR, fără membrană nucleară.',tag:'STRUCTURA BACTERIEI'},
+  {emoji:'🔴',q:'Exemple de boli cauzate de virusuri?',a:'Gripă, rujeolă, COVID-19, HIV/SIDA, hepatita B, varicela, rabia, poliomielita.',tag:'EXEMPLE'},
+  {emoji:'🔵',q:'Exemple de boli cauzate de bacterii?',a:'Tuberculoza, angina streptococică, salmoneloza, infecțiile cu E. coli, scarlatina.',tag:'EXEMPLE'},
+  {emoji:'🔬',q:'Ce metodă de reproducere folosesc bacteriile?',a:'FISIUNEA BINARĂ — o bacterie se divide în două celule fiice identice.',tag:'REPRODUCERE'},
+  {emoji:'🛡️',q:'Cum se combate o infecție virală?',a:'Vaccinuri (prevenție), antivirale (tratament), repaus. Antibioticele NU ajută.',tag:'TRATAMENT'},
+];
+let gFcIndex=0,gFcKnown=new Set();
+function gInitFlash(){gFcIndex=0;gFcKnown=new Set();gShowScreen('gscreen-flash');gRenderFlash();}
+function gRenderFlash(){
+  const c=gFlashcards[gFcIndex];
+  const card=document.getElementById('gfcCard');card.classList.remove('flipped');
+  document.getElementById('gfcEmoji').textContent=c.emoji;
+  document.getElementById('gfcQuestion').textContent=c.q;
+  document.getElementById('gfcAnswer').textContent=c.a;
+  document.getElementById('gfcTag').textContent=c.tag;
+  document.getElementById('gfcCounter').textContent=(gFcIndex+1)+' / '+gFlashcards.length;
+  document.getElementById('gfcCounterTop').textContent=(gFcIndex+1)+'/'+gFlashcards.length;
+  document.getElementById('gfcProgFill').style.width=((gFcIndex+1)/gFlashcards.length*100)+'%';
+  document.getElementById('gfcKnown').textContent='Știute: '+gFcKnown.size+' / '+gFlashcards.length;
+}
+function gFlipCard(){document.getElementById('gfcCard').classList.toggle('flipped');}
+function gFcNext(){gFcIndex=(gFcIndex+1)%gFlashcards.length;gRenderFlash();}
+function gFcPrev(){gFcIndex=(gFcIndex-1+gFlashcards.length)%gFlashcards.length;gRenderFlash();}
+function gFcMark(known){
+  if(known){gFcKnown.add(gFcIndex);gSpawnStars(3);}else gFcKnown.delete(gFcIndex);
+  if(gFcKnown.size===gFlashcards.length){setTimeout(()=>gShowReward('🎓','Bravo!','Ai marcat toate flashcard-urile! Ești gata pentru test!'),300);}
+  else gFcNext();
+}
+
+// ----- SORT DATA -----
+const gSortData=[
+  {label:'Acelular',cat:'virus'},{label:'ADN sau ARN',cat:'virus'},{label:'Capsidă',cat:'virus'},
+  {label:'Anvelopă',cat:'virus'},{label:'Spiculi',cat:'virus'},{label:'Fără ribozomi',cat:'virus'},
+  {label:'Fără metabolism',cat:'virus'},{label:'Celulă procariotă',cat:'bact'},
+  {label:'Fisiune binară',cat:'bact'},{label:'Flagel',cat:'bact'},{label:'Pili',cat:'bact'},
+  {label:'Ribozomi proprii',cat:'bact'},{label:'Perete celular',cat:'bact'},
+  {label:'ADN circular',cat:'bact'},{label:'Metabolism propriu',cat:'bact'},
+  {label:'Tratat cu antibiotice',cat:'bact'},
+];
+let gSortMobileSel=null;
+function gInitSort(){
+  gSortMobileSel=null;
+  document.getElementById('gSortItems').innerHTML='';
+  document.getElementById('gZoneVirus').innerHTML='<h4>🦠 Virus</h4>';
+  document.getElementById('gZoneBact').innerHTML='<h4>🔵 Bacterie</h4>';
+  document.getElementById('gSortFb').style.display='none';
+  document.getElementById('gSortScoreTop').textContent='';
+  const arr=[...gSortData].sort(()=>Math.random()-.5);
+  arr.forEach(item=>{
+    const chip=document.createElement('div');
+    chip.className='gsort-chip';chip.textContent=item.label;chip.dataset.cat=item.cat;
+    chip.draggable=true;chip.id='gchip_'+item.label.replace(/\s/g,'_');
+    chip.addEventListener('dragstart',e=>{e.dataTransfer.setData('text',chip.id);chip.style.opacity='.5';});
+    chip.addEventListener('dragend',()=>{chip.style.opacity='1';});
+    chip.addEventListener('click',()=>gSortMobileClick(chip));
+    document.getElementById('gSortItems').appendChild(chip);
+  });
+  document.getElementById('gZoneVirus').addEventListener('click',()=>{
+    if(gSortMobileSel){gSortMobileSel.style.outline='';document.getElementById('gZoneVirus').appendChild(gSortMobileSel);gSortMobileSel=null;}
+  });
+  document.getElementById('gZoneBact').addEventListener('click',()=>{
+    if(gSortMobileSel){gSortMobileSel.style.outline='';document.getElementById('gZoneBact').appendChild(gSortMobileSel);gSortMobileSel=null;}
+  });
+}
+function gSortMobileClick(chip){
+  if(gSortMobileSel===chip){gSortMobileSel=null;chip.style.outline='';return;}
+  if(gSortMobileSel) gSortMobileSel.style.outline='';
+  gSortMobileSel=chip;chip.style.outline='3px solid #7c3aed';
+}
+function gAllowDrop(e){e.preventDefault();e.currentTarget.classList.add('gdrag-over');}
+document.addEventListener('dragleave',e=>{if(e.target.classList&&e.target.classList.contains('gsort-zone'))e.target.classList.remove('gdrag-over');});
+function gDropItem(e,zone){
+  e.preventDefault();e.currentTarget.classList.remove('gdrag-over');
+  const id=e.dataTransfer.getData('text');const chip=document.getElementById(id);if(!chip)return;
+  chip.style.opacity='1';
+  const target=document.getElementById(zone==='virus'?'gZoneVirus':'gZoneBact');
+  target.appendChild(chip);
+}
+function gCheckSort(){
+  let ok=0,total=0;
+  document.querySelectorAll('.gsort-chip').forEach(chip=>{
+    if(!chip.closest('#gSortItems')){
+      total++;const zone=chip.closest('#gZoneVirus')?'virus':'bact';const good=zone===chip.dataset.cat;
+      chip.classList.remove('gcorrect','gwrong');chip.classList.add(good?'gcorrect':'gwrong');
+      if(good) ok++;
+    }
+  });
+  const fb=document.getElementById('gSortFb');fb.style.display='block';
+  if(total===0){fb.textContent='Nu ai sortat niciun element!';return;}
+  const pct=Math.round(ok/total*100);
+  document.getElementById('gSortScoreTop').textContent=ok+'/'+total;
+  if(pct===100){fb.innerHTML='<strong>🏆 Perfect!</strong> Toate '+total+' corecte!';gSpawnStars(8);}
+  else if(pct>=60)fb.innerHTML='<strong>👍 Bine!</strong> '+ok+' din '+total+' corecte. Cele roșii sunt greșite.';
+  else fb.innerHTML='<strong>💪 Mai încearcă!</strong> '+ok+' din '+total+'. Recitește tabelul comparativ.';
+}
+
+// ----- FILL DATA -----
+const gFillData=[
+  {before:'Virusurile sunt entități ',blank:'acelulare',after:', fără metabolism propriu.',hint:'Op. celular'},
+  {before:'Capsida este învelișul ',blank:'proteic',after:' al virusului.',hint:'Material'},
+  {before:'Bacteriile se reproduc prin ',blank:'fisiune binară',after:'.',hint:'Metodă de diviziune'},
+  {before:'Flagelul bacterian are rol în ',blank:'deplasare',after:'.',hint:'Mișcare'},
+  {before:'Antibioticele acționează asupra ',blank:'bacteriilor',after:' sensibile, nu a virusurilor.',hint:'Organisme'},
+  {before:'Spiculii virali au rol în ',blank:'atașare',after:' pe celula-gazdă.',hint:'Fixare'},
+  {before:'Nucleoidul bacterian conține ADN ',blank:'circular',after:' dublu catenar.',hint:'Formă'},
+  {before:'Anvelopa lipidică este prezentă la unele ',blank:'virusuri',after:'.',hint:'La care?'},
+  {before:'Pilii bacterieni au rol în ',blank:'aderență',after:' și transfer genetic.',hint:'Lipire'},
+  {before:'Ribozomii bacterieni participă la sinteza ',blank:'proteinelor',after:'.',hint:'Macromolecule'},
+];
+let gFillIndex=0,gFillScore=0;
+function gInitFill(){gFillIndex=0;gFillScore=0;gShowScreen('gscreen-fill');gRenderFill();}
+function gRenderFill(){
+  if(gFillIndex>=gFillData.length){gShowGameResult('fill',gFillScore,gFillData.length);return;}
+  const s=gFillData[gFillIndex];
+  document.getElementById('gFillProg').textContent=(gFillIndex+1)+'/'+gFillData.length+' · ✓'+gFillScore;
+  document.getElementById('gFillContent').innerHTML=`<div class="gfill-card"><h4>Completează — indiciu: <em>${s.hint}</em></h4><p class="gfill-sentence">${s.before}<input class="gfill-blank" id="gFillBlank" placeholder="?" autocomplete="off" onkeydown="if(event.key==='Enter') gCheckFill()"/>${s.after}</p></div>`;
+  document.getElementById('gFillFb').style.display='none';document.getElementById('gFillFb').className='gfill-fb';
+  setTimeout(()=>{const b=document.getElementById('gFillBlank');if(b)b.focus();},50);
+}
+function gCheckFill(){
+  const inp=document.getElementById('gFillBlank');if(!inp)return;
+  const val=inp.value.trim().toLowerCase();const s=gFillData[gFillIndex];
+  const ok=val===s.blank.toLowerCase();
+  inp.classList.add(ok?'gbok':'gbbad');inp.disabled=true;
+  const fb=document.getElementById('gFillFb');fb.style.display='block';
+  if(ok){fb.className='gfill-fb gbok';fb.textContent='✅ Corect! "'+s.blank+'" este răspunsul perfect.';gFillScore++;gSpawnStars(3);}
+  else{fb.className='gfill-fb gbbad';fb.textContent='❌ Greșit. Corect: "'+s.blank+'"';}
+  setTimeout(gNextFill,1600);
+}
+function gNextFill(){gFillIndex++;gRenderFill();}
+
+// ----- MATCH DATA -----
+const gMatchPairs=[
+  {s:'Capsidă',f:'Protejează materialul genetic viral'},
+  {s:'Anvelopă',f:'Înveliș lipidic extern al virusului'},
+  {s:'Spiculi',f:'Atașare pe celula-gazdă'},
+  {s:'Material genetic viral',f:'ADN sau ARN cu info pentru replicare'},
+  {s:'Flagel',f:'Deplasarea bacteriei'},
+  {s:'Pili',f:'Aderență și transfer genetic'},
+  {s:'Nucleoid',f:'Conține ADN-ul bacterian circular'},
+  {s:'Perete celular',f:'Formă și rezistență mecanică'},
+];
+let gMatchLeft=null,gMatchScore=0;
+function gInitMatch(){
+  gMatchLeft=null;gMatchScore=0;gShowScreen('gscreen-match');
+  document.getElementById('gMatchScoreTop').textContent='';document.getElementById('gMatchScoreBot').textContent='';
+  const lEl=document.getElementById('gMatchLeft');const rEl=document.getElementById('gMatchRight');
+  lEl.innerHTML='';rEl.innerHTML='';
+  const shuffR=[...gMatchPairs].sort(()=>Math.random()-.5);
+  gMatchPairs.forEach((p,i)=>{
+    const li=document.createElement('div');li.className='gmatch-item';li.dataset.id=i;li.dataset.side='left';
+    li.textContent=p.s;li.addEventListener('click',()=>gMatchClick(li));lEl.appendChild(li);
+  });
+  shuffR.forEach(p=>{
+    const ri=document.createElement('div');ri.className='gmatch-item';ri.dataset.func=p.f;ri.dataset.side='right';
+    ri.textContent=p.f;ri.addEventListener('click',()=>gMatchClick(ri));rEl.appendChild(ri);
+  });
+}
+function gMatchClick(el){
+  if(el.classList.contains('gmok')||el.classList.contains('glocked'))return;
+  if(el.dataset.side==='left'){
+    document.querySelectorAll('.gmatch-item[data-side="left"]').forEach(e=>e.classList.remove('gsel-l'));
+    el.classList.add('gsel-l');gMatchLeft=el;
+  } else {
+    if(!gMatchLeft)return;
+    const li=gMatchLeft;const id=parseInt(li.dataset.id);const correct=gMatchPairs[id].f===el.dataset.func;
+    if(correct){
+      li.classList.remove('gsel-l');li.classList.add('gmok','glocked');
+      el.classList.add('gmok','glocked');gMatchScore++;gSpawnStars(3);
+      document.getElementById('gMatchScoreTop').textContent='✅ '+gMatchScore+'/'+gMatchPairs.length;
+      document.getElementById('gMatchScoreBot').textContent=gMatchScore+' potriviri corecte din '+gMatchPairs.length;
+      if(gMatchScore===gMatchPairs.length)setTimeout(()=>gShowReward('🏆','Potrivire perfectă!','Ai asociat corect toate structurile!'),300);
+    } else {
+      li.classList.add('gmbad');el.classList.add('gmbad');
+      setTimeout(()=>{li.classList.remove('gmbad');el.classList.remove('gmbad');},500);
+    }
+    gMatchLeft=null;document.querySelectorAll('.gmatch-item[data-side="left"]').forEach(e=>e.classList.remove('gsel-l'));
+  }
+}
+
+// ----- QUIZ DATA -----
+const gQuizData=[
+  {q:'Virusurile sunt:',ans:['Organisme unicelulare procariote','Entități acelulare','Celule eucariote','Ciuperci microscopice'],c:1,fb:'Virusurile sunt entități ACELULARE. Nu sunt celule și nu au metabolism propriu.'},
+  {q:'Bacteriile se reproduc, de obicei, prin:',ans:['Meioză','Fisiune binară','Încolțire virală','Sporogeneză'],c:1,fb:'Bacteriile se divid prin FISIUNE BINARĂ — o celulă mamă devine două celule fiice identice.'},
+  {q:'Care structură protejează materialul genetic al virusului?',ans:['Flagelul','Capsida','Capsula bacteriană','Membrana celulară'],c:1,fb:'CAPSIDA este învelișul proteic al virusului care protejează materialul genetic.'},
+  {q:'Antibioticele acționează direct asupra:',ans:['Virusurilor','Ambelor în mod egal','Bacteriilor sensibile','Prioanilor'],c:2,fb:'Antibioticele atacă structuri bacteriene. Ele NU au efect direct asupra virusurilor.'},
+  {q:'Ce structură bacteriană are rol în deplasare?',ans:['Capsida','Nucleoidul','Flagelul','Spiculii'],c:2,fb:'FLAGELUL este apendicele filamentos care propulsează bacteria prin lichidul înconjurător.'},
+  {q:'Materialul genetic al virusurilor poate fi:',ans:['Doar ADN','Doar ARN','ADN sau ARN','Numai proteine'],c:2,fb:'Virusurile pot conține fie ADN, fie ARN — nu simultan.'},
+  {q:'Pilii bacterieni au rol în:',ans:['Fotosinteză','Aderență și transfer genetic','Producerea de energie','Digestie'],c:1,fb:'PILII sunt prelungiri cu rol în aderență și transferul de ADN între bacterii.'},
+  {q:'COVID-19 este cauzat de:',ans:['O bacterie','Un prion','Un virus (coronavirus)','O ciupercă'],c:2,fb:'COVID-19 este cauzat de un CORONAVIRUS (SARS-CoV-2), un virus cu anvelopă și spiculi.'},
+  {q:'ADN-ul bacterian se află în:',ans:['Nucleu membranar','Nucleoid','Capsidă','Mitocondrii'],c:1,fb:'Bacteriile sunt procariote — ADN-ul se află în NUCLEOID, fără membrană nucleară.'},
+  {q:'Care afirmație este corectă?',ans:['Bacteriile sunt întotdeauna dăunătoare','Virusurile au ribozomi proprii','Bacteriile pot fi utile sau dăunătoare','Antibioticele vindecă gripa'],c:2,fb:'Există bacterii UTILE (flora intestinală, iaurt) și bacterii patogene. Antibioticele nu tratează gripa!'},
+];
+let gQIndex=0,gQScore=0,gQTimer=null,gQSec=0,gQLocked=false;
+function gInitQuiz(){gQIndex=0;gQScore=0;gShowScreen('gscreen-quiz');gRenderQuiz();}
+function gRenderQuiz(){
+  if(gQIndex>=gQuizData.length){gShowGameResult('quiz',gQScore,gQuizData.length);return;}
+  gQLocked=false;clearInterval(gQTimer);gQSec=20;
+  const q=gQuizData[gQIndex];
+  document.getElementById('gQuizScoreTop').textContent='⭐ '+gQScore+'/'+gQIndex;
+  const pct=Math.round(gQIndex/gQuizData.length*100);
+  let html=`<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+    <span style="font-family:'Bangers',cursive;font-size:1.05rem;letter-spacing:.05em;color:#475569">Întrebarea ${gQIndex+1} / ${gQuizData.length}</span>
+    <span style="font-family:'Bangers',cursive;font-size:1.05rem;letter-spacing:.05em;color:#059669">⭐ ${gQScore} puncte</span>
+  </div>
+  <div class="gprog"><div class="gprog-fill" style="width:${pct}%"></div></div>
+  <div style="height:12px"></div>
+  <div class="gqcard">
+    <h3><span class="gq-timer" id="gQTimer">⏱ 20s</span>${q.q}</h3>
+    <div class="gq-answers">`;
+  q.ans.forEach((a,i)=>{html+=`<button class="gq-ans" id="gqa${i}" onclick="gSelectAns(${i})">${a}</button>`;});
+  html+=`</div><div class="gq-fb" id="gQFb"></div>
+  <button class="gq-next" id="gQNext" onclick="gNextQ()">${gQIndex===gQuizData.length-1?'🏆 Rezultat':'Următoarea ▶'}</button>
+  </div>`;
+  document.getElementById('gQuizContent').innerHTML=html;
+  gQTimer=setInterval(()=>{
+    gQSec--;const el=document.getElementById('gQTimer');if(el)el.textContent='⏱ '+gQSec+'s';
+    if(gQSec<=0){clearInterval(gQTimer);if(!gQLocked)gAutoWrong();}
+  },1000);
+}
+function gSelectAns(i){
+  if(gQLocked)return;gQLocked=true;clearInterval(gQTimer);
+  const q=gQuizData[gQIndex];const ok=i===q.c;
+  document.querySelectorAll('.gq-ans').forEach((b,j)=>{b.classList.add('glocked');if(j===q.c)b.classList.add('gcorrect');if(j===i&&i!==q.c)b.classList.add('gwrong');});
+  const fb=document.getElementById('gQFb');fb.className='gq-fb '+(ok?'gbok':'gbbad');fb.textContent=(ok?'✅ ':'❌ ')+q.fb;
+  if(ok){gQScore++;gSpawnStars(4);}
+  document.getElementById('gQNext').style.display='inline-block';
+  document.getElementById('gQuizScoreTop').textContent='⭐ '+gQScore+'/'+(gQIndex+1);
+}
+function gAutoWrong(){
+  const q=gQuizData[gQIndex];
+  document.querySelectorAll('.gq-ans').forEach((b,j)=>{b.classList.add('glocked');if(j===q.c)b.classList.add('gcorrect');});
+  const fb=document.getElementById('gQFb');fb.className='gq-fb gbbad';fb.textContent='⏰ Timp depășit! '+q.fb;
+  document.getElementById('gQNext').style.display='inline-block';
+}
+function gNextQ(){gQIndex++;gRenderQuiz();}
+
+// ----- RESULT -----
+function gShowGameResult(mode,score,total){
+  clearInterval(gQTimer);
+  const pct=Math.round(score/total*100);
+  let emoji,title,msg;
+  if(pct>=90){emoji='🏆';title='Excelent!';msg='Stăpânești perfect noțiunile! Ești gata pentru orice test de biologie.';}
+  else if(pct>=70){emoji='🥈';title='Foarte bine!';msg='Ai o bază solidă. Mai exersează câteva noțiuni și vei fi invincibil!';}
+  else if(pct>=50){emoji='💪';title='Bine început!';msg='Progresezi frumos. Recitește flashcard-urile și mai încearcă!';}
+  else{emoji='📚';title='Mai studiază!';msg='Nu-ți face griji — recitește lecția și încearcă din nou. Poți!';}
+  document.getElementById('grEmoji').textContent=emoji;
+  document.getElementById('grTitle').textContent=title;
+  document.getElementById('grScore').textContent=score+' / '+total+' ('+pct+'%)';
+  document.getElementById('grMsg').textContent=msg;
+  document.getElementById('grBtnAgain').onclick=()=>gStartMode(mode);
+  gShowScreen('gscreen-result');
+  if(pct>=70)gSpawnStars(12);
+}
+
+// ----- MODE MAP -----
+const gModeInits={
+  flash:gInitFlash,
+  sort:()=>{gShowScreen('gscreen-sort');gInitSort();},
+  fill:gInitFill,
+  match:gInitMatch,
+  quiz:gInitQuiz
+};
+</script>
+<script>
+// ====== BACKGROUND PARTICLE CANVAS — Viruși & Bacterii ======
+(function(){
+  const canvas = document.getElementById('bgCanvas');
+  const ctx = canvas.getContext('2d');
+  let W, H;
+
+  function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // ---- draw helpers ----
+  function drawVirus(ctx, x, y, r, alpha){
+    ctx.save(); ctx.globalAlpha = alpha;
+    // outer envelope
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(230,57,70,.55)'; ctx.lineWidth = r*.12;
+    ctx.stroke();
+    // capsid
+    ctx.beginPath(); ctx.arc(x, y, r*.62, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(124,58,237,.5)'; ctx.lineWidth = r*.1;
+    ctx.stroke();
+    // genetic core
+    ctx.beginPath(); ctx.arc(x, y, r*.28, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(230,57,70,.35)'; ctx.fill();
+    // spikes
+    const spikes = 8;
+    for(let i=0;i<spikes;i++){
+      const a = (Math.PI*2/spikes)*i;
+      const x1 = x + Math.cos(a)*r*.9;
+      const y1 = y + Math.sin(a)*r*.9;
+      const x2 = x + Math.cos(a)*(r+r*.45);
+      const y2 = y + Math.sin(a)*(r+r*.45);
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+      ctx.strokeStyle='rgba(230,57,70,.6)'; ctx.lineWidth=r*.08; ctx.stroke();
+      ctx.beginPath(); ctx.arc(x2,y2,r*.12,0,Math.PI*2);
+      ctx.fillStyle='rgba(230,57,70,.7)'; ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function drawBacteria(ctx, x, y, rx, ry, angle, alpha){
+    ctx.save(); ctx.globalAlpha = alpha;
+    ctx.translate(x, y); ctx.rotate(angle);
+    // outer capsule
+    ctx.beginPath(); ctx.ellipse(0,0,rx,ry,0,0,Math.PI*2);
+    ctx.strokeStyle='rgba(5,150,105,.55)'; ctx.lineWidth=rx*.07; ctx.stroke();
+    // inner wall
+    ctx.beginPath(); ctx.ellipse(0,0,rx*.8,ry*.8,0,0,Math.PI*2);
+    ctx.strokeStyle='rgba(5,150,105,.35)'; ctx.lineWidth=rx*.06; ctx.stroke();
+    // nucleoid
+    ctx.beginPath(); ctx.ellipse(0,0,rx*.38,ry*.38,0,0,Math.PI*2);
+    ctx.fillStyle='rgba(230,57,70,.2)'; ctx.fill();
+    ctx.strokeStyle='rgba(230,57,70,.4)'; ctx.lineWidth=rx*.05; ctx.stroke();
+    // flagellum
+    ctx.beginPath();
+    ctx.moveTo(rx,0);
+    ctx.bezierCurveTo(rx+rx*.6,ry*.4, rx+rx*.9,ry*.9, rx+rx*.7,ry*1.4);
+    ctx.strokeStyle='rgba(5,150,105,.45)'; ctx.lineWidth=rx*.07; ctx.lineCap='round'; ctx.stroke();
+    ctx.restore();
+  }
+
+  // ---- particle pool ----
+  const particles = [];
+  const COUNT = 22;
+
+  function randomParticle(forceRespawn){
+    const isVirus = Math.random() < .5;
+    const r = isVirus ? Math.random()*22+10 : null;
+    const rx = !isVirus ? Math.random()*28+14 : null;
+    const ry = rx ? rx * (Math.random()*.3+.4) : null;
+    return {
+      type: isVirus ? 'virus' : 'bacteria',
+      x: forceRespawn ? -80 : Math.random()*window.innerWidth,
+      y: Math.random()*window.innerHeight,
+      r, rx, ry,
+      vx: Math.random()*.35+.08,
+      vy: (Math.random()-.5)*.22,
+      angle: Math.random()*Math.PI*2,
+      va: (Math.random()-.5)*.004,
+      alpha: Math.random()*.18+.06,
+    };
+  }
+
+  for(let i=0;i<COUNT;i++) particles.push(randomParticle(false));
+
+  function animate(){
+    ctx.clearRect(0,0,W,H);
+    for(const p of particles){
+      p.x += p.vx;
+      p.y += p.vy;
+      p.angle += p.va;
+      // wrap around
+      if(p.x > W + 100){ p.x = -100; p.y = Math.random()*H; }
+      if(p.y < -100) p.y = H+100;
+      if(p.y > H+100) p.y = -100;
+
+      if(p.type==='virus') drawVirus(ctx, p.x, p.y, p.r, p.alpha);
+      else drawBacteria(ctx, p.x, p.y, p.rx, p.ry, p.angle, p.alpha);
+    }
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+</script>
+</body>
+</html>
